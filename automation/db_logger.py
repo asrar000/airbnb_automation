@@ -1,7 +1,12 @@
 """
 Database logging helpers.
 Each test step calls save_result() to persist outcomes.
+
+NOTE: All DB calls are wrapped in run_in_thread() because Django's ORM
+cannot be called from within Playwright's internal event loop context.
+The fix is to run each DB operation in a plain threading.Thread.
 """
+import threading
 from automation.models import (
     ResultModel,
     AutoSuggestionItem,
@@ -12,6 +17,30 @@ from automation.models import (
 )
 
 
+def run_in_thread(fn, *args, **kwargs):
+    """
+    Run a callable in a plain OS thread and block until done.
+    This sidesteps Django's 'You cannot call this from an async context'
+    error that appears when ORM calls happen inside Playwright's event loop.
+    """
+    result_holder = [None]
+    error_holder = [None]
+
+    def target():
+        try:
+            result_holder[0] = fn(*args, **kwargs)
+        except Exception as exc:
+            error_holder[0] = exc
+
+    t = threading.Thread(target=target)
+    t.start()
+    t.join()
+
+    if error_holder[0]:
+        raise error_holder[0]
+    return result_holder[0]
+
+
 def save_result(
     test_case: str,
     url: str,
@@ -20,13 +49,16 @@ def save_result(
     screenshot_path: str = "",
 ) -> ResultModel:
     """Persist a single test-step result and return the saved object."""
-    result = ResultModel.objects.create(
-        test_case=test_case,
-        url=url,
-        passed=passed,
-        comment=comment,
-        screenshot_path=screenshot_path,
-    )
+    def _save():
+        return ResultModel.objects.create(
+            test_case=test_case,
+            url=url,
+            passed=passed,
+            comment=comment,
+            screenshot_path=screenshot_path,
+        )
+
+    result = run_in_thread(_save)
     status = "PASSED ✅" if passed else "FAILED ❌"
     print(f"  [{status}] {test_case}")
     if comment:
@@ -34,55 +66,70 @@ def save_result(
     return result
 
 
-def save_suggestions(result: ResultModel, suggestions: list[str]) -> None:
+def save_suggestions(result: ResultModel, suggestions: list) -> None:
     """Persist auto-suggestion items linked to a result."""
-    for idx, text in enumerate(suggestions, start=1):
-        AutoSuggestionItem.objects.create(result=result, index=idx, text=text)
+    def _save():
+        for idx, text in enumerate(suggestions, start=1):
+            AutoSuggestionItem.objects.create(result=result, index=idx, text=text)
+
+    run_in_thread(_save)
 
 
-def save_listings(result: ResultModel, listings: list[dict]) -> None:
+def save_listings(result: ResultModel, listings: list) -> None:
     """Persist scraped listing cards linked to a result."""
-    for item in listings:
-        ListingItem.objects.create(
-            result=result,
-            title=item.get("title", ""),
-            price=item.get("price", ""),
-            image_url=item.get("image_url", ""),
-        )
+    def _save():
+        for item in listings:
+            ListingItem.objects.create(
+                result=result,
+                title=item.get("title", ""),
+                price=item.get("price", ""),
+                image_url=item.get("image_url", ""),
+            )
+
+    run_in_thread(_save)
 
 
 def save_listing_detail(
     result: ResultModel,
     title: str,
     subtitle: str,
-    image_urls: list[str],
+    image_urls: list,
 ) -> None:
     """Persist listing detail page data."""
-    ListingDetail.objects.create(
-        result=result,
-        title=title,
-        subtitle=subtitle,
-        image_urls="\n".join(image_urls),
-    )
+    def _save():
+        ListingDetail.objects.create(
+            result=result,
+            title=title,
+            subtitle=subtitle,
+            image_urls="\n".join(image_urls),
+        )
+
+    run_in_thread(_save)
 
 
-def save_network_logs(result: ResultModel, network_requests: list[dict]) -> None:
+def save_network_logs(result: ResultModel, network_requests: list) -> None:
     """Persist captured network requests (first 50 to avoid huge datasets)."""
-    for entry in network_requests[:50]:
-        NetworkLog.objects.create(
-            result=result,
-            method=entry.get("method", ""),
-            url=entry.get("url", "")[:2000],
-            status=entry.get("status"),
-            resource_type=entry.get("resource_type", ""),
-        )
+    def _save():
+        for entry in network_requests[:50]:
+            NetworkLog.objects.create(
+                result=result,
+                method=entry.get("method", ""),
+                url=entry.get("url", "")[:2000],
+                status=entry.get("status"),
+                resource_type=entry.get("resource_type", ""),
+            )
+
+    run_in_thread(_save)
 
 
-def save_console_logs(result: ResultModel, console_messages: list[dict]) -> None:
+def save_console_logs(result: ResultModel, console_messages: list) -> None:
     """Persist captured browser console messages."""
-    for msg in console_messages:
-        ConsoleLog.objects.create(
-            result=result,
-            log_type=msg.get("type", "log")[:10],
-            message=msg.get("text", "")[:2000],
-        )
+    def _save():
+        for msg in console_messages:
+            ConsoleLog.objects.create(
+                result=result,
+                log_type=msg.get("type", "log")[:10],
+                message=msg.get("text", "")[:2000],
+            )
+
+    run_in_thread(_save)

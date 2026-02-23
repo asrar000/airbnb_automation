@@ -17,39 +17,76 @@ from automation.models import ResultModel
 class Step06ListingDetail(BaseTestStep):
     name = "Item Details Page Verification Test"
 
+    LISTING_LINK_SELECTORS = [
+        '[data-testid="listing-card-wrapper"] a[href*="/rooms/"]',
+        'a[href*="airbnb.com/rooms/"]',
+        '[itemprop="itemListElement"] a',
+        '[data-testid="card-container"] a',
+        'article a[href*="/rooms/"]',
+        'a[href*="/rooms/"]',
+    ]
+
     def run(self) -> ResultModel:
         print("\n[Step 06] Item Details Page Verification...")
 
         listings_page_url = self.page.url
 
-        listing_selectors = [
-            '[data-testid="listing-card-wrapper"] a',
-            '[itemprop="itemListElement"] a',
-            'article a',
-        ]
-        listing_links = []
-        for sel in listing_selectors:
-            listing_links = self.page.query_selector_all(sel)
-            if listing_links:
-                break
+        # --- Collect listing hrefs directly ---
+        listing_hrefs = []
+        for sel in self.LISTING_LINK_SELECTORS:
+            try:
+                links = self.page.query_selector_all(sel)
+                for link in links:
+                    href = link.get_attribute("href") or ""
+                    if href and href not in listing_hrefs:
+                        listing_hrefs.append(href)
+                if listing_hrefs:
+                    print(f"  Found {len(listing_hrefs)} listing links via: {sel}")
+                    break
+            except Exception:
+                continue
 
-        if not listing_links:
+        # Fallback: grab all <a> with /rooms/ in href
+        if not listing_hrefs:
+            try:
+                all_links = self.page.query_selector_all("a[href]")
+                for link in all_links:
+                    href = link.get_attribute("href") or ""
+                    if "/rooms/" in href and href not in listing_hrefs:
+                        listing_hrefs.append(href)
+                print(f"  Fallback found {len(listing_hrefs)} /rooms/ links.")
+            except Exception:
+                pass
+
+        if not listing_hrefs:
             screenshot_path = self.screenshot("step06_no_listings")
             return self.save(False, "No listing links found to click.", screenshot_path)
 
-        chosen_idx = random.randint(0, min(len(listing_links) - 1, 9))
+        # --- Choose a random listing (from first 10) ---
+        chosen_idx = random.randint(0, min(len(listing_hrefs) - 1, 9))
+        href = listing_hrefs[chosen_idx]
+
+        # Ensure absolute URL
+        if href.startswith("/"):
+            href = f"https://www.airbnb.com{href}"
+        elif not href.startswith("http"):
+            href = f"https://www.airbnb.com/{href}"
+
+        print(f"  Navigating to listing: {href[:80]}")
+
         try:
-            href = listing_links[chosen_idx].get_attribute("href") or ""
-            if href:
-                if href.startswith("/"):
-                    href = f"https://www.airbnb.com{href}"
-                self.page.goto(href, wait_until="domcontentloaded", timeout=30000)
-            else:
-                listing_links[chosen_idx].click()
+            self.page.goto(href, wait_until="domcontentloaded", timeout=30000)
         except Exception as e:
-            print(f"  Warning clicking listing: {e}")
+            print(f"  goto() failed: {e} — trying click approach.")
             try:
-                listing_links[0].click()
+                self.page.go_back()
+                time.sleep(2)
+                links = self.page.query_selector_all("a[href]")
+                for link in links:
+                    h = link.get_attribute("href") or ""
+                    if "/rooms/" in h:
+                        link.click()
+                        break
             except Exception:
                 pass
 
@@ -62,15 +99,17 @@ class Step06ListingDetail(BaseTestStep):
 
         detail_loaded = (
             "airbnb.com/rooms" in current_url
-            or ("airbnb.com" in current_url and current_url != listings_page_url)
+            or ("/rooms/" in current_url)
+            or (current_url != listings_page_url and "airbnb.com" in current_url)
         )
 
+        # --- Capture title ---
         title = ""
         for sel in [
+            'h1[elementtiming="LCP-title"]',
             'h1',
             '[data-testid="listing-title"]',
             '[data-section-id="TITLE_DEFAULT"] h1',
-            'h1[elementtiming="LCP-title"]',
         ]:
             try:
                 el = self.page.query_selector(sel)
@@ -81,40 +120,37 @@ class Step06ListingDetail(BaseTestStep):
             except Exception:
                 continue
 
+        # --- Capture subtitle ---
         subtitle = ""
         for sel in [
-            '[data-testid="listing-subtitle"]',
             '[data-section-id="OVERVIEW_DEFAULT"] h2',
+            '[data-testid="listing-subtitle"]',
             'h2',
-            'section[aria-label*="location"] span',
         ]:
             try:
-                el = self.page.query_selector(sel)
-                if el:
-                    subtitle = el.inner_text().strip()
-                    if subtitle and subtitle != title:
+                els = self.page.query_selector_all(sel)
+                for el in els:
+                    text = el.inner_text().strip()
+                    if text and text != title:
+                        subtitle = text
                         break
+                if subtitle:
+                    break
             except Exception:
                 continue
 
+        # --- Collect image URLs ---
         image_urls = []
-        for img in self.page.query_selector_all(
-            'img[src*="a0.muscache.com"], img[src*="airbnb.com"], section img'
-        ):
+        for img in self.page.query_selector_all("img"):
             try:
                 src = img.get_attribute("src") or ""
-                if src and src not in image_urls and len(src) > 10:
+                if (
+                    src
+                    and src not in image_urls
+                    and len(src) > 10
+                    and ("muscache" in src or "airbnb" in src)
+                ):
                     image_urls.append(src)
-            except Exception:
-                continue
-
-        for div in self.page.query_selector_all('[style*="background-image"]'):
-            try:
-                style = div.get_attribute("style") or ""
-                if "url(" in style:
-                    url = style.split("url(")[1].split(")")[0].strip('"\'')
-                    if url not in image_urls:
-                        image_urls.append(url)
             except Exception:
                 continue
 

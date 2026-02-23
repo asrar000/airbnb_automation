@@ -43,17 +43,24 @@ class Step01LandingAndSearch(BaseTestStep):
     def run(self) -> ResultModel:
         print("\n[Step 01] Landing and Initial Search Setup...")
 
-        # --- Clear storage ---
+        # --- Clear cookies BEFORE navigation (safe) ---
         self.page.context.clear_cookies()
-        self.page.evaluate("() => { localStorage.clear(); sessionStorage.clear(); }")
 
-        # --- Navigate ---
+        # --- Navigate to Airbnb ---
         self.page.goto(
             self.shared_state.get("target_url", "https://www.airbnb.com/"),
-            wait_until="networkidle",
+            wait_until="domcontentloaded",
             timeout=60000,
         )
         self.wait(2)
+
+        # --- Clear localStorage AFTER page loads to avoid SecurityError ---
+        try:
+            self.page.evaluate(
+                "() => { window.localStorage.clear(); window.sessionStorage.clear(); }"
+            )
+        except Exception:
+            pass  # Some pages block storage access — safe to ignore
 
         # --- Dismiss popups ---
         self.dismiss_popups()
@@ -63,13 +70,19 @@ class Step01LandingAndSearch(BaseTestStep):
         title = self.page.title()
         homepage_ok = (
             "airbnb" in title.lower()
-            or self.page.query_selector('[data-testid="structured-search-input-field-query"]') is not None
+            or self.page.query_selector(
+                '[data-testid="structured-search-input-field-query"]'
+            ) is not None
         )
 
         screenshot_path = self.screenshot("step01_homepage")
 
         if not homepage_ok:
-            return self.save(False, f"Homepage did not load correctly. Title: {title}", screenshot_path)
+            return self.save(
+                False,
+                f"Homepage did not load correctly. Title: {title}",
+                screenshot_path,
+            )
 
         # --- Select a random country ---
         country = random.choice(TOP_20_COUNTRIES)
@@ -96,7 +109,10 @@ class Step01LandingAndSearch(BaseTestStep):
 
         if not clicked:
             try:
-                self.page.click('[data-testid="structured-search-input-field-query"]', timeout=5000)
+                self.page.click(
+                    '[data-testid="structured-search-input-field-query"]',
+                    timeout=5000,
+                )
                 clicked = True
             except Exception:
                 pass

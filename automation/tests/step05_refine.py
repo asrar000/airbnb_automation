@@ -15,66 +15,111 @@ from automation.models import ResultModel
 class Step05RefineSearch(BaseTestStep):
     name = "Refine Button Date Validation Test"
 
+    LISTING_CARD_SELECTORS = [
+        '[data-testid="listing-card-wrapper"]',
+        '[data-testid="card-container"]',
+        '[itemprop="itemListElement"]',
+        'div[id^="listing"]',
+        'article',
+    ]
+
+    TITLE_SELECTORS = [
+        '[data-testid="listing-card-title"]',
+        'div[role="heading"]',
+        'span[id*="title"]',
+        'div[aria-label]',
+    ]
+
+    PRICE_SELECTORS = [
+        'span[data-testid*="price"]',
+        'span:has-text("$")',
+        '._1y74zjx',
+        'span[aria-label*="price" i]',
+    ]
+
     def run(self) -> ResultModel:
         print("\n[Step 05] Refine Search and Item List Verification...")
 
-        time.sleep(3)
+        # Give the results page time to fully render
+        time.sleep(4)
 
         current_url = self.page.url
         screenshot_path = self.screenshot("step05_results_page")
 
-        results_loaded = "airbnb.com/s/" in current_url or "airbnb.com/rooms" in current_url
+        print(f"  Current URL: {current_url[:100]}")
 
-        checkin = self.shared_state.get("checkin_date", "")
-        checkout = self.shared_state.get("checkout_date", "")
-
-        url_has_dates = (
-            "check_in" in current_url
-            or "checkin" in current_url
-            or "adults" in current_url
+        # Check if we are on a search results page
+        results_loaded = (
+            "airbnb.com/s/" in current_url
+            or "/s/" in current_url
         )
 
-        listing_selectors = [
-            '[data-testid="listing-card-wrapper"]',
-            '[itemprop="itemListElement"]',
-            '[data-testid="card-container"]',
-            'div[id^="listing"]',
-        ]
+        # Check URL contains date/guest params
+        url_has_dates = any(
+            param in current_url
+            for param in ["checkin", "check_in", "checkout", "check_out"]
+        )
+        url_has_guests = "adults" in current_url or "guests" in current_url
 
+        # Read displayed dates from UI
+        displayed_dates = ""
+        for sel in [
+            '[data-testid="structured-search-input-field-split-dates"]',
+            'button[aria-label*="dates" i]',
+            'button[aria-label*="check" i]',
+        ]:
+            try:
+                el = self.page.query_selector(sel)
+                if el:
+                    displayed_dates = el.inner_text().strip()
+                    if displayed_dates:
+                        break
+            except Exception:
+                continue
+
+        # --- Scrape listings ---
         listing_elements = []
-        for sel in listing_selectors:
+        for sel in self.LISTING_CARD_SELECTORS:
             listing_elements = self.page.query_selector_all(sel)
             if listing_elements:
+                print(f"  Found listing cards via: {sel}")
                 break
-
-        if not listing_elements:
-            listing_elements = self.page.query_selector_all("article")
 
         listings = []
         for el in listing_elements[:20]:
             listing = {}
-            for title_sel in ['[data-testid="listing-card-title"]', 'div[role="heading"]', 'span[id*="title"]']:
+
+            # Title
+            for sel in self.TITLE_SELECTORS:
                 try:
-                    t = el.query_selector(title_sel)
+                    t = el.query_selector(sel)
                     if t:
-                        listing["title"] = t.inner_text().strip()
-                        break
+                        text = t.inner_text().strip()
+                        if text:
+                            listing["title"] = text
+                            break
                 except Exception:
                     pass
 
-            for price_sel in ['span[data-testid*="price"]', '._1y74zjx', 'span:has-text("$")']:
+            # Price
+            for sel in self.PRICE_SELECTORS:
                 try:
-                    p = el.query_selector(price_sel)
+                    p = el.query_selector(sel)
                     if p:
-                        listing["price"] = p.inner_text().strip()
-                        break
+                        text = p.inner_text().strip()
+                        if text:
+                            listing["price"] = text
+                            break
                 except Exception:
                     pass
 
+            # Image
             try:
                 img = el.query_selector("img")
                 if img:
-                    listing["image_url"] = img.get_attribute("src") or ""
+                    src = img.get_attribute("src") or ""
+                    if src:
+                        listing["image_url"] = src
             except Exception:
                 pass
 
@@ -84,26 +129,16 @@ class Step05RefineSearch(BaseTestStep):
         print(f"  Scraped {len(listings)} listings.")
         self.shared_state["listings"] = listings
 
-        expected_dates_comment = f"Expected: {checkin} - {checkout}"
-
-        displayed_dates = ""
-        for sel in [
-            '[data-testid="structured-search-input-field-split-dates"]',
-            '[aria-label*="dates"]',
-        ]:
-            try:
-                el = self.page.query_selector(sel)
-                if el:
-                    displayed_dates = el.inner_text().strip()
-                    break
-            except Exception:
-                continue
+        checkin = self.shared_state.get("checkin_date", "")
+        checkout = self.shared_state.get("checkout_date", "")
 
         passed = results_loaded and len(listings) > 0
         comment = (
-            f"Refine buttons dates: {displayed_dates}. {expected_dates_comment}. "
-            f"URL has dates: {url_has_dates}. Scraped {len(listings)} listings. "
-            f"URL: {current_url[:100]}"
+            f"Refine buttons dates: {displayed_dates}. "
+            f"Expected: {checkin} - {checkout}. "
+            f"URL has dates: {url_has_dates}. URL has guests: {url_has_guests}. "
+            f"Scraped {len(listings)} listings. "
+            f"URL: {current_url[:150]}"
         )
 
         result = self.save(passed, comment, screenshot_path)

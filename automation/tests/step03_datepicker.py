@@ -19,14 +19,45 @@ class Step03DatePicker(BaseTestStep):
 
     NEXT_MONTH_SELECTORS = [
         '[aria-label="Move forward to switch to the next month."]',
-        '[data-testid="datepicker-next"]',
-        'button[aria-label*="Next"]',
-        '[aria-label="Next"]',
+        'button[aria-label*="forward" i]',
+        'button[aria-label*="next month" i]',
+        'button[aria-label*="Next" i]',
+        '[data-testid="calendar-next-month-btn"]',
         '.DayPickerNavigation_button__next',
     ]
 
-    def _find_and_click(self, selectors: list) -> bool:
-        for sel in selectors:
+    # Selectors that confirm the date picker panel is open
+    DATEPICKER_OPEN_SELECTORS = [
+        '[data-testid="structured-search-input-field-split-dates-0"]',
+        '[data-testid="datepicker-portal"]',
+        '[aria-label="Calendar"]',
+        'div[role="dialog"]',
+        '[data-testid="calendar-container"]',
+        '.DayPicker',
+        'table[role="presentation"]',
+        'td[role="button"]',
+    ]
+
+    # Selectors to click on the "When / Add dates" field to open the picker
+    WHEN_FIELD_SELECTORS = [
+        '[data-testid="structured-search-input-field-split-dates-0"]',
+        '[placeholder="Add dates"]',
+        'button:has-text("Add dates")',
+        '[data-testid="date-input"]',
+    ]
+
+    def _picker_is_open(self, timeout_ms: int = 4000) -> bool:
+        for sel in self.DATEPICKER_OPEN_SELECTORS:
+            try:
+                self.page.wait_for_selector(sel, timeout=timeout_ms)
+                print(f"  Date picker detected via: {sel}")
+                return True
+            except Exception:
+                continue
+        return False
+
+    def _click_next_month(self) -> bool:
+        for sel in self.NEXT_MONTH_SELECTORS:
             try:
                 el = self.page.query_selector(sel)
                 if el and el.is_visible():
@@ -34,53 +65,53 @@ class Step03DatePicker(BaseTestStep):
                     return True
             except Exception:
                 continue
+        # Last resort: find any button whose aria-label contains "next"
+        try:
+            buttons = self.page.query_selector_all('button')
+            for btn in buttons:
+                label = (btn.get_attribute("aria-label") or "").lower()
+                if "next" in label or "forward" in label:
+                    btn.click()
+                    return True
+        except Exception:
+            pass
         return False
+
+    def _get_available_day_buttons(self) -> list:
+        """Return clickable (non-disabled) day buttons from the calendar."""
+        selectors = [
+            'td[aria-disabled="false"] button',
+            'td:not([aria-disabled="true"]) button',
+            'button[data-day]:not([disabled])',
+            '[data-testid="calendar-day"]:not([disabled])',
+            'table td button:not([disabled])',
+        ]
+        for sel in selectors:
+            days = self.page.query_selector_all(sel)
+            if days:
+                return days
+        return []
 
     def run(self) -> ResultModel:
         print("\n[Step 03] Date Picker Interaction...")
-        time.sleep(1.5)
+        time.sleep(2)
 
-        datepicker_selectors = [
-            '[data-testid="structured-search-input-field-split-dates-0"]',
-            '[data-testid="datepicker"]',
-            '[aria-label="Calendar"]',
-            '.DayPicker',
-            '[data-testid="calendar-container"]',
-            'div[role="dialog"]',
-            '[id*="date"]',
-        ]
-        picker_visible = False
-        for sel in datepicker_selectors:
-            try:
-                self.page.wait_for_selector(sel, timeout=5000)
-                picker_visible = True
-                break
-            except Exception:
-                continue
+        # --- Check if picker already opened (Step 02 click may trigger it) ---
+        picker_visible = self._picker_is_open(timeout_ms=4000)
 
+        # --- If not open, try clicking the "When / Add dates" field ---
         if not picker_visible:
-            when_selectors = [
-                '[data-testid="structured-search-input-field-split-dates-0"]',
-                '[placeholder="Add dates"]',
-                'button:has-text("Add dates")',
-            ]
-            for sel in when_selectors:
+            print("  Date picker not open — clicking 'When/Add dates' field...")
+            for sel in self.WHEN_FIELD_SELECTORS:
                 try:
                     el = self.page.query_selector(sel)
-                    if el:
+                    if el and el.is_visible():
                         el.click()
-                        time.sleep(1)
+                        time.sleep(1.5)
                         break
                 except Exception:
                     continue
-
-            for sel in datepicker_selectors:
-                try:
-                    self.page.wait_for_selector(sel, timeout=5000)
-                    picker_visible = True
-                    break
-                except Exception:
-                    continue
+            picker_visible = self._picker_is_open(timeout_ms=5000)
 
         screenshot_path = self.screenshot("step03_datepicker_open")
 
@@ -91,85 +122,79 @@ class Step03DatePicker(BaseTestStep):
                 screenshot_path,
             )
 
-        # Click Next Month randomly 3-8 times
+        # --- Click Next Month 3-8 times ---
         next_clicks = random.randint(3, 8)
         print(f"  Clicking Next Month {next_clicks} times...")
-        for _ in range(next_clicks):
-            clicked = self._find_and_click(self.NEXT_MONTH_SELECTORS)
-            if not clicked:
-                try:
-                    arrows = self.page.query_selector_all('button[aria-label*="next" i]')
-                    if arrows:
-                        arrows[-1].click()
-                except Exception:
-                    pass
-            time.sleep(0.5)
+        for i in range(next_clicks):
+            success = self._click_next_month()
+            if not success:
+                print(f"  Warning: next month click {i + 1} may have failed.")
+            time.sleep(0.6)
 
-        # Read current visible month
+        # --- Read current visible month label ---
         month_label = ""
         month_selectors = [
             'h2[aria-live="polite"]',
             '[data-testid="calendar-heading"]',
+            'h2[aria-live]',
             '.CalendarMonth_caption strong',
-            '[aria-label*="month"]',
+            'h2',
         ]
         for sel in month_selectors:
             try:
-                el = self.page.query_selector(sel)
-                if el:
-                    month_label = el.inner_text().strip()
-                    if month_label:
+                els = self.page.query_selector_all(sel)
+                for el in els:
+                    text = el.inner_text().strip()
+                    if text and any(
+                        m in text for m in [
+                            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+                        ]
+                    ):
+                        month_label = text
                         break
+                if month_label:
+                    break
             except Exception:
                 continue
 
         self.shared_state["selected_month"] = month_label
-        print(f"  Current month: {month_label}")
+        print(f"  Current month shown: {month_label}")
 
+        # --- Select check-in date ---
         checkin_date = ""
         checkout_date = ""
 
-        day_selectors = [
-            'td[aria-disabled="false"] button',
-            'button[data-day]:not([disabled])',
-            '[data-testid="calendar-day"]:not([disabled])',
-            'td:not([aria-disabled="true"]) button',
-        ]
-
-        available_days = []
-        for sel in day_selectors:
-            available_days = self.page.query_selector_all(sel)
-            if available_days:
-                break
-
-        if not available_days:
-            available_days = self.page.query_selector_all('table td button:not([disabled])')
+        available_days = self._get_available_day_buttons()
+        print(f"  Available day buttons found: {len(available_days)}")
 
         if len(available_days) >= 2:
+            # Pick a day not too close to the start (index 4-7)
             checkin_idx = min(5, len(available_days) - 2)
             try:
                 checkin_el = available_days[checkin_idx]
-                checkin_date = checkin_el.get_attribute("aria-label") or checkin_el.inner_text().strip()
+                checkin_date = (
+                    checkin_el.get_attribute("aria-label")
+                    or checkin_el.inner_text().strip()
+                )
                 checkin_el.click()
-                time.sleep(0.8)
+                time.sleep(1)
                 print(f"  Check-in selected: {checkin_date}")
             except Exception as e:
                 print(f"  Warning: Could not click check-in: {e}")
 
-            checkout_days = []
-            for sel in day_selectors:
-                checkout_days = self.page.query_selector_all(sel)
-                if checkout_days:
-                    break
-            if not checkout_days:
-                checkout_days = self.page.query_selector_all('table td button:not([disabled])')
+            # Re-query days after check-in click (calendar may re-render)
+            available_days = self._get_available_day_buttons()
+            checkout_idx = min(checkin_idx + 5, len(available_days) - 1)
 
-            checkout_idx = min(checkin_idx + 5, len(checkout_days) - 1)
             try:
-                checkout_el = checkout_days[checkout_idx]
-                checkout_date = checkout_el.get_attribute("aria-label") or checkout_el.inner_text().strip()
+                checkout_el = available_days[checkout_idx]
+                checkout_date = (
+                    checkout_el.get_attribute("aria-label")
+                    or checkout_el.inner_text().strip()
+                )
                 checkout_el.click()
-                time.sleep(0.8)
+                time.sleep(1)
                 print(f"  Check-out selected: {checkout_date}")
             except Exception as e:
                 print(f"  Warning: Could not click checkout: {e}")
