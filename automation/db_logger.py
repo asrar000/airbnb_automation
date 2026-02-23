@@ -2,9 +2,8 @@
 Database logging helpers.
 Each test step calls save_result() to persist outcomes.
 
-NOTE: All DB calls are wrapped in run_in_thread() because Django's ORM
+All DB calls are wrapped in run_in_thread() because Django's ORM
 cannot be called from within Playwright's internal event loop context.
-The fix is to run each DB operation in a plain threading.Thread.
 """
 import threading
 from automation.models import (
@@ -20,8 +19,7 @@ from automation.models import (
 def run_in_thread(fn, *args, **kwargs):
     """
     Run a callable in a plain OS thread and block until done.
-    This sidesteps Django's 'You cannot call this from an async context'
-    error that appears when ORM calls happen inside Playwright's event loop.
+    Fixes: 'You cannot call this from an async context'
     """
     result_holder = [None]
     error_holder = [None]
@@ -71,7 +69,6 @@ def save_suggestions(result: ResultModel, suggestions: list) -> None:
     def _save():
         for idx, text in enumerate(suggestions, start=1):
             AutoSuggestionItem.objects.create(result=result, index=idx, text=text)
-
     run_in_thread(_save)
 
 
@@ -85,7 +82,6 @@ def save_listings(result: ResultModel, listings: list) -> None:
                 price=item.get("price", ""),
                 image_url=item.get("image_url", ""),
             )
-
     run_in_thread(_save)
 
 
@@ -103,12 +99,11 @@ def save_listing_detail(
             subtitle=subtitle,
             image_urls="\n".join(image_urls),
         )
-
     run_in_thread(_save)
 
 
 def save_network_logs(result: ResultModel, network_requests: list) -> None:
-    """Persist captured network requests (first 50 to avoid huge datasets)."""
+    """Persist captured network requests (first 50 only)."""
     def _save():
         for entry in network_requests[:50]:
             NetworkLog.objects.create(
@@ -118,7 +113,6 @@ def save_network_logs(result: ResultModel, network_requests: list) -> None:
                 status=entry.get("status"),
                 resource_type=entry.get("resource_type", ""),
             )
-
     run_in_thread(_save)
 
 
@@ -131,5 +125,4 @@ def save_console_logs(result: ResultModel, console_messages: list) -> None:
                 log_type=msg.get("type", "log")[:10],
                 message=msg.get("text", "")[:2000],
             )
-
     run_in_thread(_save)

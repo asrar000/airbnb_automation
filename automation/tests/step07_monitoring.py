@@ -43,9 +43,9 @@ class Step07MonitoringLogs(BaseTestStep):
             f"Console errors: {total_con_errors}."
         )
 
-        # Pass if data was captured; errors are logged but don't fail the step
-        # (Airbnb itself may return some 4xx for analytics/tracking — expected)
-        passed = total_network > 0 and total_console >= 0
+        # Pass if both network and console capture are working.
+        # (4xx/5xx and console errors are still reported but do not auto-fail.)
+        passed = total_network > 0 and total_console > 0
 
         result = save_result(
             test_case=self.name,

@@ -20,6 +20,7 @@ from automation.tests.step04_guestpicker import Step04GuestPicker
 from automation.tests.step05_refine import Step05RefineSearch
 from automation.tests.step06_listing_detail import Step06ListingDetail
 from automation.tests.step07_monitoring import Step07MonitoringLogs
+from automation.runtime_state import clear_checkpoint
 
 
 class Command(BaseCommand):
@@ -40,6 +41,9 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        # Start each run with a fresh checkpoint file.
+        clear_checkpoint()
+
         # --- Resolve settings ---
         target_url = options.get("url") or getattr(settings, "TARGET_URL", "https://www.airbnb.com/")
 

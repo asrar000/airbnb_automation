@@ -1,10 +1,13 @@
 """
 Step 06: Item Details Page Verification
-- Randomly select one listing from results
-- Click on it
-- Verify details page loads
-- Capture title, subtitle, and all image URLs
-- Store in DB
+
+Randomly selects one listing from the search results, clicks its title/link, and:
+- Verifies the listing details page opens successfully
+- Captures the listing title (h1) and subtitle (h2)
+- Collects all image URLs from the FRONT GALLERY only
+  (does NOT click 'Show all photos' — only captures the images
+   immediately visible in the hero grid on page load)
+- Stores all collected details in the database
 """
 import random
 import time
@@ -17,110 +20,235 @@ from automation.models import ResultModel
 class Step06ListingDetail(BaseTestStep):
     name = "Item Details Page Verification Test"
 
-    LISTING_LINK_SELECTORS = [
-        '[data-testid="listing-card-wrapper"] a[href*="/rooms/"]',
-        'a[href*="airbnb.com/rooms/"]',
-        '[itemprop="itemListElement"] a',
-        '[data-testid="card-container"] a',
-        'article a[href*="/rooms/"]',
-        'a[href*="/rooms/"]',
+    LISTING_CARD_SELECTORS = [
+        '[data-testid="listing-card-wrapper"]',
+        '[data-testid="card-container"]',
+        '[itemprop="itemListElement"]',
+        'article',
     ]
+
+    CARD_TITLE_SELECTORS = [
+        '[data-testid="listing-card-title"]',
+        'div[role="heading"]',
+        'span[id*="title"]',
+        'h3',
+        'h2',
+    ]
+
+    def _collect_front_gallery_images(self) -> list:
+        """
+        Collect only the images visible in the front gallery grid.
+
+        Airbnb shows 5 photos in a hero grid on the listing detail page.
+        These are captured individually WITHOUT clicking 'Show all photos'.
+        """
+        image_urls = []
+
+        # Targeted selectors for the hero/front gallery section only
+        gallery_selectors = [
+            'div[data-section-id="HERO_DEFAULT"] img',
+            'div[data-plugin-in-point-id="HERO_DEFAULT"] img',
+            '[data-testid="photo-viewer-section"] img',
+            '[data-testid="hero-image-gallery"] img',
+            'section[aria-label*="Photo" i] img',
+            'div[data-testid="gallery-photo-grid"] img',
+        ]
+
+        for sel in gallery_selectors:
+            imgs = self.page.query_selector_all(sel)
+            if imgs:
+                for img in imgs:
+                    try:
+                        src = img.get_attribute("src") or ""
+                        if (src
+                                and len(src) > 10
+                                and src not in image_urls
+                                and ("muscache" in src or "airbnb" in src)):
+                            image_urls.append(src)
+                    except Exception:
+                        continue
+                if image_urls:
+                    print(f"  Gallery images collected via: {sel}")
+                    break
+
+        # Fallback: all Airbnb CDN images visible on the page
+        if not image_urls:
+            print("  Falling back to all visible Airbnb CDN images...")
+            for img in self.page.query_selector_all("img"):
+                try:
+                    src = img.get_attribute("src") or ""
+                    if (src
+                            and len(src) > 10
+                            and src not in image_urls
+                            and ("muscache" in src or "airbnb" in src)):
+                        image_urls.append(src)
+                except Exception:
+                    continue
+
+        return image_urls
+
+    def _collect_listing_candidates(self) -> list:
+        candidates = []
+        seen_hrefs = set()
+
+        for card_sel in self.LISTING_CARD_SELECTORS:
+            cards = self.page.query_selector_all(card_sel)
+            if not cards:
+                continue
+
+            for card in cards[:30]:
+                try:
+                    link = card.query_selector('a[href*="/rooms/"]')
+                    if not link:
+                        continue
+
+                    href = (link.get_attribute("href") or "").strip()
+                    if not href or "/rooms/" not in href:
+                        continue
+
+                    dedupe_key = href.split("?")[0]
+                    if dedupe_key in seen_hrefs:
+                        continue
+
+                    title = ""
+                    for title_sel in self.CARD_TITLE_SELECTORS:
+                        try:
+                            t = card.query_selector(title_sel)
+                            if t:
+                                text = (t.inner_text() or "").strip()
+                                if text:
+                                    title = text
+                                    break
+                        except Exception:
+                            continue
+
+                    if not title:
+                        try:
+                            raw = (link.inner_text() or "").strip()
+                            title = raw.split("\n")[0].strip() if raw else ""
+                        except Exception:
+                            title = ""
+
+                    seen_hrefs.add(dedupe_key)
+                    candidates.append({"href": href, "title": title})
+                except Exception:
+                    continue
+
+            if candidates:
+                break
+
+        return candidates
+
+    def _click_listing_from_results(self, href: str, title: str) -> bool:
+        # First try role-based link click by title.
+        if title:
+            try:
+                loc = self.page.get_by_role("link", name=title).first
+                if loc.count() > 0:
+                    loc.click(timeout=4000)
+                    return True
+            except Exception:
+                pass
+
+        # Then fallback to exact href/text click in page JS (force same-tab).
+        try:
+            return bool(self.page.evaluate(
+                """
+                (payload) => {
+                    const { href, title } = payload;
+                    const norm = (v) => (v || '').trim().toLowerCase();
+                    const wantedHref = (href || '').trim();
+                    const wantedTitle = norm(title || '');
+
+                    const links = [...document.querySelectorAll('a[href*="/rooms/"]')]
+                        .filter(a => a.offsetParent !== null);
+
+                    let target = null;
+                    if (wantedHref) {
+                        target = links.find(a => (a.getAttribute('href') || '').trim() === wantedHref);
+                    }
+                    if (!target && wantedTitle) {
+                        target = links.find(a => norm(a.innerText).includes(wantedTitle));
+                    }
+                    if (!target) return false;
+
+                    target.setAttribute('target', '_self');
+                    target.click();
+                    return true;
+                }
+                """,
+                {"href": href, "title": title},
+            ))
+        except Exception:
+            return False
+
+    def _wait_for_detail_navigation(self, results_page_url: str, timeout_s: int = 20) -> bool:
+        for _ in range(timeout_s):
+            current = self.page.url
+            if "/rooms/" in current and current != results_page_url:
+                return True
+            time.sleep(1)
+        return False
 
     def run(self) -> ResultModel:
         print("\n[Step 06] Item Details Page Verification...")
+        self.restore_checkpoint()
+        self.safe_dismiss_popups()
 
-        listings_page_url = self.page.url
+        results_page_url = self.page.url
 
-        # --- Collect listing hrefs directly ---
-        listing_hrefs = []
-        for sel in self.LISTING_LINK_SELECTORS:
-            try:
-                links = self.page.query_selector_all(sel)
-                for link in links:
-                    href = link.get_attribute("href") or ""
-                    if href and href not in listing_hrefs:
-                        listing_hrefs.append(href)
-                if listing_hrefs:
-                    print(f"  Found {len(listing_hrefs)} listing links via: {sel}")
-                    break
-            except Exception:
-                continue
-
-        # Fallback: grab all <a> with /rooms/ in href
-        if not listing_hrefs:
-            try:
-                all_links = self.page.query_selector_all("a[href]")
-                for link in all_links:
-                    href = link.get_attribute("href") or ""
-                    if "/rooms/" in href and href not in listing_hrefs:
-                        listing_hrefs.append(href)
-                print(f"  Fallback found {len(listing_hrefs)} /rooms/ links.")
-            except Exception:
-                pass
-
-        if not listing_hrefs:
+        candidates = self._collect_listing_candidates()
+        if not candidates:
             screenshot_path = self.screenshot("step06_no_listings")
-            return self.save(False, "No listing links found to click.", screenshot_path)
+            return self.save(False, "No listing titles/links found on results page.", screenshot_path)
 
-        # --- Choose a random listing (from first 10) ---
-        chosen_idx = random.randint(0, min(len(listing_hrefs) - 1, 9))
-        href = listing_hrefs[chosen_idx]
+        chosen_idx = random.randint(0, min(len(candidates) - 1, 9))
+        chosen = candidates[chosen_idx]
+        chosen_href = chosen.get("href", "")
+        chosen_title = chosen.get("title", "")
 
-        # Ensure absolute URL
-        if href.startswith("/"):
-            href = f"https://www.airbnb.com{href}"
-        elif not href.startswith("http"):
-            href = f"https://www.airbnb.com/{href}"
+        print(f"  Clicking listing #{chosen_idx + 1}: '{chosen_title or chosen_href}'")
 
-        print(f"  Navigating to listing: {href[:80]}")
+        clicked = self._click_listing_from_results(chosen_href, chosen_title)
+        if not clicked:
+            screenshot_path = self.screenshot("step06_click_failed")
+            return self.save(
+                False,
+                f"Failed to click selected listing title/link: '{chosen_title or chosen_href}'.",
+                screenshot_path,
+            )
 
-        try:
-            self.page.goto(href, wait_until="domcontentloaded", timeout=30000)
-        except Exception as e:
-            print(f"  goto() failed: {e} — trying click approach.")
-            try:
-                self.page.go_back()
-                time.sleep(2)
-                links = self.page.query_selector_all("a[href]")
-                for link in links:
-                    h = link.get_attribute("href") or ""
-                    if "/rooms/" in h:
-                        link.click()
-                        break
-            except Exception:
-                pass
+        navigated = self._wait_for_detail_navigation(results_page_url)
+        print(f"  Detail navigation success: {navigated}")
 
         time.sleep(3)
-        self.dismiss_popups()
+        self.safe_dismiss_popups()
         time.sleep(1)
 
         current_url = self.page.url
         screenshot_path = self.screenshot("step06_listing_detail")
 
-        detail_loaded = (
-            "airbnb.com/rooms" in current_url
-            or ("/rooms/" in current_url)
-            or (current_url != listings_page_url and "airbnb.com" in current_url)
-        )
+        detail_loaded = navigated and "/rooms/" in current_url and current_url != results_page_url
 
-        # --- Capture title ---
+        # Capture listing title (h1)
         title = ""
         for sel in [
             'h1[elementtiming="LCP-title"]',
-            'h1',
-            '[data-testid="listing-title"]',
             '[data-section-id="TITLE_DEFAULT"] h1',
+            '[data-testid="listing-title"]',
+            'h1',
         ]:
             try:
                 el = self.page.query_selector(sel)
                 if el:
-                    title = el.inner_text().strip()
-                    if title:
+                    text = el.inner_text().strip()
+                    if text:
+                        title = text
                         break
             except Exception:
                 continue
 
-        # --- Capture subtitle ---
+        # Capture listing subtitle (h2 — location or room type description)
         subtitle = ""
         for sel in [
             '[data-section-id="OVERVIEW_DEFAULT"] h2',
@@ -139,30 +267,24 @@ class Step06ListingDetail(BaseTestStep):
             except Exception:
                 continue
 
-        # --- Collect image URLs ---
-        image_urls = []
-        for img in self.page.query_selector_all("img"):
-            try:
-                src = img.get_attribute("src") or ""
-                if (
-                    src
-                    and src not in image_urls
-                    and len(src) > 10
-                    and ("muscache" in src or "airbnb" in src)
-                ):
-                    image_urls.append(src)
-            except Exception:
-                continue
+        # Collect front gallery images (no 'Show all photos' click)
+        image_urls = self._collect_front_gallery_images()
 
-        print(f"  Title: {title[:80]}")
+        print(f"  Title   : {title[:80]}")
         print(f"  Subtitle: {subtitle[:80]}")
-        print(f"  Images found: {len(image_urls)}")
+        print(f"  Images  : {len(image_urls)} (front gallery only, no Show all photos)")
+        self.shared_state["selected_listing_title"] = title
+        self.shared_state["selected_listing_subtitle"] = subtitle
+        self.shared_state["selected_listing_images"] = image_urls
+        self.checkpoint("step06_listing_detail_collected")
 
         passed = detail_loaded and bool(title)
         comment = (
-            f"Listing detail page loaded: {detail_loaded}. "
-            f"Title: '{title[:100]}'. Subtitle: '{subtitle[:100]}'. "
-            f"Images collected: {len(image_urls)}."
+            f"Detail page loaded: {detail_loaded}. "
+            f"Clicked listing: '{chosen_title[:100]}'. "
+            f"Title: '{title[:100]}'. "
+            f"Subtitle: '{subtitle[:100]}'. "
+            f"Front gallery images collected: {len(image_urls)}."
         )
 
         result = self.save(passed, comment, screenshot_path)

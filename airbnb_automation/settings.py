@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-default-key")
 DEBUG = os.environ.get("DEBUG", "True") == "True"
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -77,5 +77,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom settings loaded from .env
 SCREENSHOT_DIR = BASE_DIR / os.environ.get("SCREENSHOT_DIR", "screenshots")
+SCREENSHOT_URL = "/screenshots/"
+RUNTIME_STATE_FILE = BASE_DIR / os.environ.get("RUNTIME_STATE_FILE", "runtime_state.json")
 TARGET_URL = os.environ.get("TARGET_URL", "https://www.airbnb.com/")
 HEADLESS = os.environ.get("HEADLESS", "True") == "True"

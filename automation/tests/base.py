@@ -11,6 +11,7 @@ from playwright.sync_api import Page
 from automation.browser import take_screenshot, dismiss_popups
 from automation.db_logger import save_result
 from automation.models import ResultModel
+from automation.runtime_state import save_checkpoint, merge_checkpoint
 
 
 class BaseTestStep(ABC):
@@ -19,12 +20,6 @@ class BaseTestStep(ABC):
     name: str = "Unnamed Step"
 
     def __init__(self, page: Page, url: str, shared_state: dict):
-        """
-        :param page: Active Playwright sync Page object.
-        :param url: Current page URL to store with result.
-        :param shared_state: Dict shared across all steps for passing data
-                             (e.g. selected country, chosen dates, guest count).
-        """
         self.page = page
         self.url = url
         self.shared_state = shared_state
@@ -51,4 +46,33 @@ class BaseTestStep(ABC):
         time.sleep(seconds)
 
     def dismiss_popups(self) -> None:
+        """
+        Dismiss all visible popups on the current page.
+        Expanded selector list covers the 'Got it' pricing modal
+        and any other Airbnb overlay that may appear at any time.
+        """
         dismiss_popups(self.page)
+
+    def safe_dismiss_popups(self) -> None:
+        """
+        Silently attempt popup dismissal — never raises, safe to call anywhere.
+        Use this before any important interaction to clear overlays first.
+        """
+        try:
+            dismiss_popups(self.page)
+        except Exception:
+            pass
+
+    def checkpoint(self, step_name: str) -> None:
+        """Persist selected shared_state fields to runtime_state.json."""
+        try:
+            save_checkpoint(self.shared_state, step_name)
+        except Exception:
+            pass
+
+    def restore_checkpoint(self) -> None:
+        """Merge saved state into empty shared_state fields."""
+        try:
+            merge_checkpoint(self.shared_state)
+        except Exception:
+            pass

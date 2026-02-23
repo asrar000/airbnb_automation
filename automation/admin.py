@@ -1,6 +1,36 @@
+from pathlib import Path
+
+from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
+
 from .models import ResultModel, AutoSuggestionItem, ListingItem, ListingDetail, NetworkLog, ConsoleLog
+
+
+def _screenshot_href(raw_path: str) -> str:
+    if not raw_path:
+        return ""
+
+    if raw_path.startswith(("http://", "https://")):
+        return raw_path
+
+    base_url = settings.SCREENSHOT_URL if settings.SCREENSHOT_URL.endswith("/") else f"{settings.SCREENSHOT_URL}/"
+    if raw_path.startswith(base_url):
+        return raw_path
+
+    screenshot_root = Path(settings.SCREENSHOT_DIR).resolve()
+    path_obj = Path(raw_path)
+
+    try:
+        if path_obj.is_absolute():
+            rel = path_obj.resolve().relative_to(screenshot_root)
+        elif path_obj.parts and path_obj.parts[0] == screenshot_root.name:
+            rel = Path(*path_obj.parts[1:])
+        else:
+            rel = path_obj
+        return f"{base_url}{rel.as_posix().lstrip('/')}"
+    except Exception:
+        return f"{base_url}{path_obj.name}"
 
 
 class AutoSuggestionInline(admin.TabularInline):
@@ -65,8 +95,9 @@ class ResultModelAdmin(admin.ModelAdmin):
 
     def screenshot_preview(self, obj):
         if obj.screenshot_path:
+            href = _screenshot_href(obj.screenshot_path)
             return format_html(
-                '<a href="{}" target="_blank">{}</a>', obj.screenshot_path, obj.screenshot_path
+                '<a href="{}" target="_blank">{}</a>', href, obj.screenshot_path
             )
         return "No screenshot"
     screenshot_preview.short_description = "Screenshot"

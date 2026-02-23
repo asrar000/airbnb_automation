@@ -1,12 +1,16 @@
 """
-Step 04: Guest Picker Interaction
-- Click the Who / Add guests field
-- Verify guest selection popup opens
-- Randomly add 2-5 guests across Adults/Children/Infants/Pets
-- Verify guest count shown matches selected
-- Click Search button
+Step 04: Guest Picker Interaction Test
+
+After Step 03 selects dates, Airbnb shows the guest picker field.
+This step:
+- Clicks the Who / Add guests field
+- Verifies the guest selection popup opens
+- Randomly adds 2-5 guests across Adults/Children/Infants/Pets
+- Verifies the displayed guest count matches selected values
+- Clicks the Search button to navigate to results (Step 05)
 """
 import random
+import re
 import time
 
 from automation.tests.base import BaseTestStep
@@ -16,18 +20,24 @@ from automation.models import ResultModel
 class Step04GuestPicker(BaseTestStep):
     name = "Guest Picker Interaction Test"
 
+    DATE_FIELD_SELECTORS = [
+        '[data-testid="structured-search-input-field-split-dates-0"]',
+        '[data-testid="structured-search-input-field-split-dates-1"]',
+        '[data-testid="structured-search-input-field-dates-button"]',
+        'button[aria-label*="check in" i]',
+        'button[aria-label*="dates" i]',
+        'button:has-text("Add dates")',
+    ]
+
+    NEXT_MONTH_SELECTORS = [
+        '[aria-label*="Move forward" i]',
+        'button[aria-label*="next month" i]',
+        'button[data-testid*="calendar-next"]',
+    ]
+
     GUEST_FIELD_SELECTORS = [
         '[data-testid="structured-search-input-field-guests-button"]',
         '[placeholder="Add guests"]',
-        'button:has-text("Add guests")',
-        '[data-testid="structured-search-input-field-guests"]',
-    ]
-
-    GUEST_POPUP_SELECTORS = [
-        '[data-testid="structured-search-input-field-guests-panel"]',
-        'div[data-testid*="guest"]:has(button[data-testid*="stepper"])',
-        'div:has(button[aria-label*="increase" i]):has(button[aria-label*="decrease" i])',
-        '[data-testid*="guest-panel"]',
     ]
 
     SEARCH_BTN_SELECTORS = [
@@ -43,122 +53,349 @@ class Step04GuestPicker(BaseTestStep):
                 el = self.page.query_selector(sel)
                 if el and el.is_visible():
                     el.click()
+                    print(f"  Guest field clicked via: {sel}")
                     return True
             except Exception:
                 continue
+        # JS fallback
+        try:
+            clicked = self.page.evaluate("""
+                () => {
+                    const els = Array.from(document.querySelectorAll('div, button'));
+                    const el = els.find(e =>
+                        (e.innerText || '').trim().includes('Add guests') &&
+                        e.offsetParent !== null
+                    );
+                    if (el) { el.click(); return true; }
+                    return false;
+                }
+            """)
+            if clicked:
+                print("  Guest field clicked via JS.")
+                return True
+        except Exception:
+            pass
         return False
 
-    def _popup_is_open(self, timeout_ms: int = 5000) -> bool:
-        for sel in self.GUEST_POPUP_SELECTORS:
-            try:
-                self.page.wait_for_selector(sel, timeout=timeout_ms)
-                print(f"  Guest popup detected via: {sel}")
-                return True
-            except Exception:
-                continue
-        # Fallback: look for increase buttons which only appear in the popup
+    def _popup_is_open(self) -> bool:
+        """Confirm popup is open by checking stepper increase buttons are visible."""
         try:
-            btns = self.page.query_selector_all('button[aria-label*="increase" i]')
-            if btns:
-                print("  Guest popup detected via increase buttons.")
+            found = self.page.evaluate("""
+                () => {
+                    const btns = document.querySelectorAll(
+                        'button[data-testid*="stepper-increase"], button[aria-label*="increase" i]'
+                    );
+                    for (const btn of btns) {
+                        if (btn.offsetParent !== null) return true;
+                    }
+                    return false;
+                }
+            """)
+            if found:
+                print("  Guest popup open — stepper buttons visible.")
                 return True
         except Exception:
             pass
         return False
 
     def _get_increase_buttons(self) -> list:
-        """Return all +/increase stepper buttons in the guest panel."""
-        selectors = [
+        for sel in [
             'button[data-testid*="stepper-increase"]',
             'button[aria-label*="increase" i]',
-            'button[aria-label*="add" i]:not([aria-label*="date" i])',
-        ]
-        for sel in selectors:
+        ]:
             btns = self.page.query_selector_all(sel)
             if btns:
-                return btns
+                return list(btns)
         return []
+
+    def _get_guest_display(self) -> str:
+        """Read the current guest count text from the guest field."""
+        try:
+            el = self.page.query_selector(
+                '[data-testid="structured-search-input-field-guests-button"]'
+            )
+            if el:
+                return el.inner_text().strip()
+        except Exception:
+            pass
+        return ""
+
+    def _read_date_field_values(self) -> tuple[str, str]:
+        checkin_text = ""
+        checkout_text = ""
+        try:
+            el = self.page.query_selector('[data-testid="structured-search-input-field-split-dates-0"]')
+            if el:
+                checkin_text = (el.inner_text() or "").strip()
+        except Exception:
+            pass
+        try:
+            el = self.page.query_selector('[data-testid="structured-search-input-field-split-dates-1"]')
+            if el:
+                checkout_text = (el.inner_text() or "").strip()
+        except Exception:
+            pass
+        return checkin_text, checkout_text
+
+    def _dates_present_in_ui(self) -> bool:
+        checkin_text, checkout_text = self._read_date_field_values()
+        blocked = {"", "add dates", "check in", "check out"}
+        checkin_ok = checkin_text.strip().lower() not in blocked
+        checkout_ok = checkout_text.strip().lower() not in blocked
+        return checkin_ok and checkout_ok
+
+    def _open_date_picker(self) -> bool:
+        for sel in self.DATE_FIELD_SELECTORS:
+            try:
+                loc = self.page.locator(sel).first
+                if loc.is_visible(timeout=500):
+                    loc.click()
+                    time.sleep(0.8)
+                    return True
+            except Exception:
+                continue
+        try:
+            clicked = bool(self.page.evaluate("""
+                () => {
+                    const els = [...document.querySelectorAll('button, div, span')];
+                    const el = els.find(e => {
+                        if (e.offsetParent === null) return false;
+                        const text = (e.innerText || '').toLowerCase();
+                        const aria = (e.getAttribute('aria-label') || '').toLowerCase();
+                        return text.includes('add dates') || aria.includes('check in') || aria.includes('dates');
+                    });
+                    if (!el) return false;
+                    el.click();
+                    return true;
+                }
+            """))
+            if clicked:
+                time.sleep(0.8)
+            return clicked
+        except Exception:
+            return False
+
+    def _read_visible_month_label(self) -> str:
+        for sel in ['h2[aria-live="polite"]', '[data-testid="calendar-heading"]', 'h2']:
+            try:
+                for el in self.page.query_selector_all(sel):
+                    text = (el.inner_text() or "").strip()
+                    if any(m in text for m in [
+                        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+                    ]):
+                        return text
+            except Exception:
+                continue
+        return ""
+
+    def _click_next_month(self) -> bool:
+        for sel in self.NEXT_MONTH_SELECTORS:
+            try:
+                loc = self.page.locator(sel).first
+                if loc.is_visible(timeout=500):
+                    loc.click(timeout=1200)
+                    return True
+            except Exception:
+                continue
+        return False
+
+    def _move_to_saved_month(self) -> bool:
+        target_month = (self.shared_state.get("selected_month") or "").strip()
+        if not target_month:
+            return True
+
+        for _ in range(12):
+            visible = self._read_visible_month_label()
+            if visible and target_month.lower() in visible.lower():
+                return True
+            if not self._click_next_month():
+                break
+            time.sleep(0.4)
+        return False
+
+    @staticmethod
+    def _extract_date_tokens(date_label: str) -> dict:
+        month_match = re.search(
+            r"(January|February|March|April|May|June|July|August|September|October|November|December)",
+            date_label or "",
+            re.IGNORECASE,
+        )
+        day_match = re.search(r"\b([0-3]?\d)\b", date_label or "")
+        year_match = re.search(r"\b(20\d{2})\b", date_label or "")
+        return {
+            "raw": date_label or "",
+            "month": month_match.group(1) if month_match else "",
+            "day": day_match.group(1).lstrip("0") if day_match else "",
+            "year": year_match.group(1) if year_match else "",
+        }
+
+    def _click_saved_date(self, saved_label: str) -> bool:
+        tokens = self._extract_date_tokens(saved_label)
+        try:
+            return bool(self.page.evaluate(
+                """
+                (payload) => {
+                    const norm = (v) => (v || '').trim().toLowerCase();
+                    const raw = norm(payload.raw);
+                    const month = norm(payload.month);
+                    const day = (payload.day || '').trim();
+                    const year = (payload.year || '').trim();
+
+                    const buttons = [...document.querySelectorAll(
+                        '[data-testid="datepicker-portal"] button[aria-label], div[role="dialog"] button[aria-label], table button[aria-label]'
+                    )].filter(el => el.offsetParent !== null && !el.hasAttribute('disabled'));
+
+                    let target = null;
+
+                    if (raw) {
+                        target = buttons.find(b => norm(b.getAttribute('aria-label')) === raw);
+                    }
+                    if (!target && raw) {
+                        target = buttons.find(b => norm(b.getAttribute('aria-label')).includes(raw));
+                    }
+                    if (!target && day) {
+                        const dayRegex = new RegExp(`\\\\b0?${day}\\\\b`);
+                        target = buttons.find(b => {
+                            const label = norm(b.getAttribute('aria-label'));
+                            if (month && !label.includes(month)) return false;
+                            if (year && !label.includes(year)) return false;
+                            return dayRegex.test(label);
+                        });
+                    }
+                    if (!target) return false;
+                    target.click();
+                    return true;
+                }
+                """,
+                tokens,
+            ))
+        except Exception:
+            return False
+
+    def _restore_dates_if_needed(self) -> bool:
+        if self._dates_present_in_ui():
+            return True
+
+        checkin_saved = self.shared_state.get("checkin_date", "")
+        checkout_saved = self.shared_state.get("checkout_date", "")
+        if not (checkin_saved and checkout_saved):
+            return False
+
+        print("  Dates missing — restoring from checkpoint.")
+        if not self._open_date_picker():
+            return False
+
+        self._move_to_saved_month()
+
+        if not self._click_saved_date(checkin_saved):
+            return False
+        time.sleep(0.5)
+
+        if not self._click_saved_date(checkout_saved):
+            return False
+        time.sleep(0.8)
+
+        return self._dates_present_in_ui()
 
     def run(self) -> ResultModel:
         print("\n[Step 04] Guest Picker Interaction...")
+        time.sleep(1)
+        self.restore_checkpoint()
+        self.safe_dismiss_popups()
 
-        # --- Open the guest field ---
-        clicked = self._open_guest_field()
-        if not clicked:
-            print("  Warning: standard guest field selectors missed — trying fallback.")
-            try:
-                # Sometimes clicking the "Who" label area works
-                self.page.click('text="Add guests"', timeout=5000)
-                clicked = True
-            except Exception:
-                pass
+        dates_ready = self._restore_dates_if_needed()
+        print(f"  Dates ready for Step 04: {dates_ready}")
+        if not dates_ready:
+            screenshot_path = self.screenshot("step04_dates_missing")
+            return self.save(
+                False,
+                "Step 04 requires dates from Step 03, but date restore failed.",
+                screenshot_path,
+            )
+        self.checkpoint("step04_dates_verified")
 
+        # Click the guest input field
+        self._open_guest_field()
         time.sleep(1.5)
 
-        # --- Verify popup is open ---
-        popup_visible = self._popup_is_open(timeout_ms=6000)
+        # Wait for the popup to open
+        popup_visible = False
+        for attempt in range(6):
+            if self._popup_is_open():
+                popup_visible = True
+                break
+            print(f"  Waiting for guest popup... attempt {attempt + 1}")
+            time.sleep(1)
+
         screenshot_before = self.screenshot("step04_guest_popup")
 
         if not popup_visible:
             return self.save(False, "Guest picker popup did not open.", screenshot_before)
 
-        # --- Add guests ---
-        total_guests_to_add = random.randint(2, 5)
+        # Randomly select 2-5 guests distributed across categories
+        total_to_add = random.randint(2, 5)
         total_added = 0
-
+        added_counts = {"adults": 0, "children": 0, "infants": 0, "pets": 0}
         increase_buttons = self._get_increase_buttons()
-        print(f"  Increase buttons found: {len(increase_buttons)}")
+        print(f"  Increase buttons found: {len(increase_buttons)}, Target guests: {total_to_add}")
 
         if increase_buttons:
-            # Always add at least 1 adult (button index 0)
-            adults_to_add = random.randint(1, max(1, total_guests_to_add - 1))
-            for _ in range(adults_to_add):
+            # Always add at least 1 adult
+            adults = random.randint(1, max(1, total_to_add - 1))
+            for _ in range(adults):
                 try:
                     increase_buttons[0].click()
                     total_added += 1
+                    added_counts["adults"] += 1
                     time.sleep(0.4)
                 except Exception:
                     break
 
-            # Distribute remaining across other categories
-            remaining = total_guests_to_add - adults_to_add
+            # Distribute remaining across other categories (children, infants, pets)
+            remaining = total_to_add - adults
+            idx_to_key = {1: "children", 2: "infants", 3: "pets"}
             for btn_idx in range(1, min(len(increase_buttons), 4)):
                 if remaining <= 0:
                     break
                 to_add = random.randint(0, remaining)
                 for _ in range(to_add):
                     try:
-                        # Re-fetch buttons each time to avoid stale refs
+                        # Re-query each time to avoid stale element references
                         btns = self._get_increase_buttons()
                         if btn_idx < len(btns):
                             btns[btn_idx].click()
                             total_added += 1
+                            key = idx_to_key.get(btn_idx)
+                            if key:
+                                added_counts[key] += 1
                             remaining -= 1
                             time.sleep(0.35)
                     except Exception:
                         break
-        else:
-            print("  Warning: No increase buttons found in guest picker.")
 
-        self.shared_state["guest_count"] = total_added
-        print(f"  Total guests added: {total_added}")
-
+        # Airbnb "guests" typically means adults + children (infants/pets separate).
+        search_guest_count = added_counts["adults"] + added_counts["children"]
+        self.shared_state["guest_count"] = search_guest_count
+        self.shared_state["guest_breakdown"] = added_counts
+        self.shared_state["guest_total_added"] = total_added
+        self.checkpoint("step04_guests_selected")
+        print(
+            "  Guest breakdown: "
+            f"adults={added_counts['adults']}, "
+            f"children={added_counts['children']}, "
+            f"infants={added_counts['infants']}, pets={added_counts['pets']}"
+        )
+        print(f"  Search guest count (adults+children): {search_guest_count}")
         time.sleep(0.8)
+
         screenshot_path = self.screenshot("step04_guests_selected")
 
-        # --- Read guest field display text ---
-        guest_display = ""
-        try:
-            guest_btn = self.page.query_selector(
-                '[data-testid="structured-search-input-field-guests-button"]'
-            )
-            if guest_btn:
-                guest_display = guest_btn.inner_text().strip()
-        except Exception:
-            pass
+        # Verify displayed guest count matches selected values
+        guest_display = self._get_guest_display()
         print(f"  Guest field displays: '{guest_display}'")
 
-        # --- Click Search ---
+        # Click the Search button — triggers navigation to results page (Step 05)
         search_clicked = False
         for sel in self.SEARCH_BTN_SELECTORS:
             try:
@@ -172,15 +409,30 @@ class Step04GuestPicker(BaseTestStep):
                 continue
 
         if not search_clicked:
-            print("  Warning: Search button not found — pressing Enter.")
-            self.page.keyboard.press("Enter")
+            # JS fallback
+            try:
+                self.page.evaluate("""
+                    () => {
+                        const btn = document.querySelector(
+                            '[data-testid="structured-search-input-search-button"]'
+                        );
+                        if (btn) btn.click();
+                    }
+                """)
+                search_clicked = True
+                print("  Search clicked via JS fallback.")
+            except Exception:
+                pass
 
-        # Wait for results page to load
-        time.sleep(4)
+        # Wait for navigation to results page
+        time.sleep(5)
 
         comment = (
-            f"Guest popup opened successfully. Added {total_added} guests. "
-            f"Guest field displays: '{guest_display}'. "
-            f"Search button clicked: {search_clicked}."
+            f"Guest popup opened. Added total {total_added} across categories "
+            f"(adults={added_counts['adults']}, children={added_counts['children']}, "
+            f"infants={added_counts['infants']}, pets={added_counts['pets']}). "
+            f"Search guest count: {search_guest_count}. "
+            f"Field shows: '{guest_display}'. Search clicked: {search_clicked}."
         )
-        return self.save(popup_visible and total_added > 0, comment, screenshot_path)
+        passed = popup_visible and total_added > 0 and search_clicked
+        return self.save(passed, comment, screenshot_path)

@@ -1,0 +1,164 @@
+{
+  "step": "step06_listing_detail_collected",
+  "saved_at": "2026-02-23T10:21:55.121772+00:00",
+  "state": {
+    "target_url": "https://www.airbnb.com/",
+    "selected_country": "Barcelona",
+    "chosen_suggestion": "Barcelona",
+    "chosen_suggestion_index": 1,
+    "destination_committed": true,
+    "selected_month": null,
+    "checkin_date": null,
+    "checkout_date": null,
+    "guest_count": 0,
+    "guest_breakdown": null,
+    "guest_total_added": null,
+    "listings": [
+      {
+        "title": "Condo in Bukit Bintang",
+        "price": "$71\n\u00a0\nfor 2 nights\n$71 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-1005022077370914380/original/be5327c3-608f-4acf-b5bf-a1dd47976caf.jpeg?im_w=720"
+      },
+      {
+        "title": "Apartment in Bukit Bintang",
+        "price": "$71\n\u00a0\nfor 2 nights\n$71 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-635481064627920753/original/33e73b5e-71fb-48c3-9a18-22e3e66ae9f7.jpeg?im_w=720"
+      },
+      {
+        "title": "Condo in Bukit Bintang",
+        "price": "$69\n\u00a0\nfor 2 nights\n$69 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-895985071564330143/original/5183d2ba-2aef-4a6a-bcdf-76a24e62362e.jpeg?im_w=720"
+      },
+      {
+        "title": "Place to stay in Cheras",
+        "price": "$47\n\u00a0\nfor 2 nights\n$47 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/848ba431-5dcb-4372-b691-feaa19ba25a4.jpg?im_w=720"
+      },
+      {
+        "title": "Apartment in Bukit Bintang",
+        "price": "$75\n\u00a0\nfor 2 nights\n$75 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1242021853925990052/original/b1d4193f-84c4-45ef-8731-094c9f15bad0.jpeg?im_w=720"
+      },
+      {
+        "title": "Apartment in Kampung Bahru",
+        "price": "$96\n\u00a0\nfor 2 nights\n$96 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1059080823274881263/original/9bc4969e-7f31-45ce-afbe-866ed52df258.jpeg?im_w=720"
+      },
+      {
+        "title": "Room in Bukit Bintang",
+        "price": "$51\n\u00a0\nfor 2 nights\n$51 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1439884980324015301/original/320a5197-05d3-4696-97b3-0935ebb63887.jpeg?im_w=720"
+      },
+      {
+        "title": "Apartment in Kuala Lumpur",
+        "price": "$108\n\u00a0\nfor 2 nights\n$108 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-1542784897437294239/original/46543bee-36e6-4386-a01f-038ba742f123.jpeg?im_w=720"
+      },
+      {
+        "title": "Apartment in Bangkok",
+        "price": "$56\n\u00a0\nfor 2 nights\n$56 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-18011265/original/d820d2e9-277a-4511-87a2-06c38860c0bf.jpeg?im_w=720"
+      },
+      {
+        "title": "Apartment in Khet Suan Luang",
+        "price": "$80\n\u00a0\nfor 2 nights\n$80 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1094739969933754698/original/a7a3ea09-84a3-44d6-aaf4-a554e16d3968.jpeg?im_w=720"
+      },
+      {
+        "title": "Place to stay in Bang Na",
+        "price": "$44\n\u00a0\nfor 2 nights\n$44 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1556223820440529314/original/e529735c-cfb1-4308-877e-8d8ddae5a2ae.jpeg?im_w=720"
+      },
+      {
+        "title": "Apartment in Bangkok",
+        "price": "$62\n\u00a0\nfor 2 nights\n$62 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-12380261/original/9a313e3b-a0e4-43ed-a11d-0a8ccdaa8a2e.jpeg?im_w=720"
+      },
+      {
+        "title": "Apartment in Khet Sathon",
+        "price": "$49\n\u00a0\nfor 2 nights\n$49 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/7138522e-e01f-4231-81c6-f8d4d2c320c7.jpg?im_w=720"
+      },
+      {
+        "title": "Loft in Watthana",
+        "price": "$116\n\u00a0\nfor 2 nights\n$116 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-1389944706261832869/original/1931b806-d83a-4ef6-a587-80c8bb7fc422.jpeg?im_w=720"
+      },
+      {
+        "title": "Apartment in Bangkok",
+        "price": "$63\n\u00a0\nfor 2 nights\n$63 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/a68da820-8de2-4a1b-b1b8-df39489fad99.jpg?im_w=720"
+      },
+      {
+        "title": "Place to stay in Din Daeng",
+        "price": "$58\n\u00a0\nfor 2 nights\n$58 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1597635896574890736/original/5aa58e30-854e-41ba-8507-566c6bcbdcc3.jpeg?im_w=720"
+      },
+      {
+        "title": "Guesthouse in Seoul",
+        "price": "$76\n\u00a0\nfor 2 nights\n$76 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-1457249423533314519/original/700ff772-eb9b-4f2c-aa33-aa0e537fbed4.jpeg?im_w=720"
+      },
+      {
+        "title": "Apartment in Seoul",
+        "price": "$56\n\u00a0\nfor 2 nights\n$56 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-1323608479580727925/original/90944563-0819-4404-b77e-a8726e1160ab.jpeg?im_w=720"
+      },
+      {
+        "title": "Room in Seoul",
+        "price": "$88\n\u00a0\nfor 2 nights\n$88 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/67179e62-f1c2-49e2-9855-c5dd5f8007ba.jpg?im_w=720"
+      },
+      {
+        "title": "Hotel in Seoul",
+        "price": "$88\n\u00a0\nfor 2 nights\n$88 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1576525202632766993/original/fbe7b6cd-acc1-4223-bb10-2d9343e66aed.jpeg?im_w=720"
+      }
+    ],
+    "selected_listing_title": "Airbnb homepage",
+    "selected_listing_subtitle": "Popular homes in Kuala Lumpur",
+    "selected_listing_images": [
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1005022077370914380/original/be5327c3-608f-4acf-b5bf-a1dd47976caf.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-635481064627920753/original/33e73b5e-71fb-48c3-9a18-22e3e66ae9f7.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-895985071564330143/original/5183d2ba-2aef-4a6a-bcdf-76a24e62362e.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/848ba431-5dcb-4372-b691-feaa19ba25a4.jpg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1242021853925990052/original/b1d4193f-84c4-45ef-8731-094c9f15bad0.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1059080823274881263/original/9bc4969e-7f31-45ce-afbe-866ed52df258.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1439884980324015301/original/320a5197-05d3-4696-97b3-0935ebb63887.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1542784897437294239/original/46543bee-36e6-4386-a01f-038ba742f123.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-18011265/original/d820d2e9-277a-4511-87a2-06c38860c0bf.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1094739969933754698/original/a7a3ea09-84a3-44d6-aaf4-a554e16d3968.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1556223820440529314/original/e529735c-cfb1-4308-877e-8d8ddae5a2ae.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-12380261/original/9a313e3b-a0e4-43ed-a11d-0a8ccdaa8a2e.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/7138522e-e01f-4231-81c6-f8d4d2c320c7.jpg?im_w=720",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1389944706261832869/original/1931b806-d83a-4ef6-a587-80c8bb7fc422.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/a68da820-8de2-4a1b-b1b8-df39489fad99.jpg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1597635896574890736/original/5aa58e30-854e-41ba-8507-566c6bcbdcc3.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1457249423533314519/original/700ff772-eb9b-4f2c-aa33-aa0e537fbed4.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1323608479580727925/original/90944563-0819-4404-b77e-a8726e1160ab.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/67179e62-f1c2-49e2-9855-c5dd5f8007ba.jpg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1576525202632766993/original/fbe7b6cd-acc1-4223-bb10-2d9343e66aed.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/d4352059-04e2-44cc-aacf-aefc80931fd9.jpg?im_w=720",
+      "https://a0.muscache.com/im/pictures/d1936a44-3993-4478-a174-20d472a6a7a8.jpg?im_w=720",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1287964987718419435/original/f6ca6a73-5d7e-4791-84af-ca27e364f119.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1206500078173403689/original/63a5169e-cb86-467a-9024-7304e8ba831f.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1341647508108104623/original/1daf0bb8-af39-4ac5-ac04-4bc1ab8cca37.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1526594979875141534/original/25748170-c259-4b43-93fb-bb9f71309830.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1570323479814907906/original/8e5a1dc2-a77d-4a2a-a72f-4569be4fbce5.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-847456265351637680/original/4563a5ff-0dd7-478f-b743-193ffe6fe659.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1465507657526873246/original/fbb3c863-290b-4640-8753-ea3f00661f58.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6Mzk3MTUzOTE%3D/original/57bc5b00-e880-4f9f-8e4a-d30447113c72.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/86aa5a51-2981-4a0e-8ac5-86a43a86fb91.jpg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6Mzg0NTg4OQ%3D%3D/original/d04f1495-32eb-47d1-af7f-3312d9a3289d.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1517823942838116485/original/76506eee-0168-4077-b43a-b5037c1119a1.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1054046558558260953/original/142924a3-5b07-4ea1-82a1-cf3945de6c0d.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1556389356944298479/original/2527adfe-2d95-45b1-b759-6ba1963eed16.png?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1147722429278217657/original/286cec33-5180-4872-8d01-719b316a09a3.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1201763512957350785/original/a206fd73-87b3-4b66-9c9b-df3d36e367fc.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1006956605646369778/original/1ddca63a-557f-4caa-9f52-658a8fd11927.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-937073018568837668/original/badeb9a3-edad-40b4-b9a7-bded77f734c2.png?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1507190587692923446/original/2f8abf35-5dea-42ef-b9a9-b72b8f61dd23.jpeg?im_w=720",
+      "https://verifi.pdscrb.com/tag?action=view&user_id=62a14177-f845-455c-99f0-abf77e605230&advertiser=airbnb&referrer=_&session_referrer=_&session_landing_url=https%3A%2F%2Fwww.airbnb.com%2F&device_id=pscrb_a51afab6-79a4-4501-893e-b2047e97131e&first_visited_at=1771841976592&stid=&ipv4=210.4.74.25&url=https%3A%2F%2Fwww.airbnb.com%2F&event_url=https%3A%2F%2Fwww.airbnb.com%2F&source=js-tag+v1.0.8&cachebust=1771841978119"
+    ]
+  }
+}
