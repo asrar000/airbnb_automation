@@ -35,6 +35,14 @@ class Step06ListingDetail(BaseTestStep):
         'h2',
     ]
 
+    def _context_fields(self) -> dict:
+        return {
+            "selected_location": (self.shared_state.get("selected_location") or ""),
+            "selected_month": (self.shared_state.get("selected_month") or ""),
+            "checkin_date": (self.shared_state.get("checkin_date") or ""),
+            "checkout_date": (self.shared_state.get("checkout_date") or ""),
+        }
+
     def _collect_front_gallery_images(self) -> list:
         """
         Collect only the images visible in the front gallery grid.
@@ -200,7 +208,12 @@ class Step06ListingDetail(BaseTestStep):
         candidates = self._collect_listing_candidates()
         if not candidates:
             screenshot_path = self.screenshot("step06_no_listings")
-            return self.save(False, "No listing titles/links found on results page.", screenshot_path)
+            return self.save(
+                False,
+                "No listing titles/links found on results page.",
+                screenshot_path,
+                **self._context_fields(),
+            )
 
         chosen_idx = random.randint(0, min(len(candidates) - 1, 9))
         chosen = candidates[chosen_idx]
@@ -216,6 +229,7 @@ class Step06ListingDetail(BaseTestStep):
                 False,
                 f"Failed to click selected listing title/link: '{chosen_title or chosen_href}'.",
                 screenshot_path,
+                **self._context_fields(),
             )
 
         navigated = self._wait_for_detail_navigation(results_page_url)
@@ -287,6 +301,6 @@ class Step06ListingDetail(BaseTestStep):
             f"Front gallery images collected: {len(image_urls)}."
         )
 
-        result = self.save(passed, comment, screenshot_path)
+        result = self.save(passed, comment, screenshot_path, **self._context_fields())
         save_listing_detail(result, title, subtitle, image_urls)
         return result

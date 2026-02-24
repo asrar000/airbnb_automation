@@ -1,123 +1,124 @@
 {
-  "step": "step05_results_scraped",
-  "saved_at": "2026-02-24T03:55:34.176253+00:00",
+  "step": "step06_listing_detail_collected",
+  "saved_at": "2026-02-24T05:11:31.399642+00:00",
   "state": {
     "target_url": "https://www.airbnb.com/",
-    "selected_country": "London",
-    "chosen_suggestion": "London",
-    "selected_location": "London",
+    "selected_country": "Berlin",
+    "chosen_suggestion": "Berlin",
+    "selected_location": "Berlin",
     "chosen_suggestion_index": 0,
     "destination_committed": true,
-    "selected_month": "June 2026",
-    "checkin_date": "16, Tuesday, June 2026. Selected check-in date.",
-    "checkout_date": "21, Sunday, June 2026. Selected checkout date.",
-    "guest_count": 0,
-    "guest_breakdown": null,
-    "guest_total_added": null,
+    "selected_month": "September 2026",
+    "checkin_date": "16, Wednesday, September 2026. Selected check-in date.",
+    "checkout_date": "22, Tuesday, September 2026. Selected checkout date.",
+    "guest_count": 1,
+    "guest_breakdown": {
+      "adults": 1,
+      "children": 0,
+      "infants": 2,
+      "pets": 2
+    },
+    "guest_total_added": 5,
     "listings": [
       {
-        "title": "Condo in Bukit Bintang",
-        "price": "$71\n\u00a0\nfor 2 nights\n$71 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-1005022077370914380/original/be5327c3-608f-4acf-b5bf-a1dd47976caf.jpeg?im_w=720"
+        "title": "Place to stay in Dhaka",
+        "price": "$62\nShow price breakdown\n\u00a0\nfor 5 nights\n$62 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1607495794125767366/original/347f06d6-95ad-439e-a026-4ea9b438d9a7.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Bukit Bintang",
-        "price": "$71\n\u00a0\nfor 2 nights\n$71 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-635481064627920753/original/33e73b5e-71fb-48c3-9a18-22e3e66ae9f7.jpeg?im_w=720"
+        "title": "Home in Dhaka",
+        "price": "$124\nShow price breakdown\n\u00a0\nfor 5 nights\n$124 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1150739407182338681/original/5e38462d-c8db-49d4-ba4c-6d55c97a415d.jpeg?im_w=720"
       },
       {
-        "title": "Condo in Bukit Bintang",
-        "price": "$69\n\u00a0\nfor 2 nights\n$69 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-895985071564330143/original/5183d2ba-2aef-4a6a-bcdf-76a24e62362e.jpeg?im_w=720"
+        "title": "Condo in Dhaka",
+        "price": "$135 \n$118\nShow price breakdown\n\u00a0\nfor 5 nights",
+        "image_url": "https://a0.muscache.com/pictures/airbnb-platform-assets/AirbnbPlatformAssets-email-dls-icons/original/c3c390ab-d1ab-4627-9cd7-608ac53b171e.png"
       },
       {
-        "title": "Place to stay in Cheras",
-        "price": "$47\n\u00a0\nfor 2 nights\n$47 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/848ba431-5dcb-4372-b691-feaa19ba25a4.jpg?im_w=720"
+        "title": "Room in Dhaka",
+        "price": "$97\nShow price breakdown\n\u00a0\nfor 5 nights\n$97 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/user/User/original/a258e012-4e7a-428d-ba4f-778961ba8806.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Bukit Bintang",
-        "price": "$75\n\u00a0\nfor 2 nights\n$75 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1242021853925990052/original/b1d4193f-84c4-45ef-8731-094c9f15bad0.jpeg?im_w=720"
+        "title": "Apartment in Dhaka District",
+        "price": "$245 \n$200\nShow price breakdown\n\u00a0\nfor 5 nights",
+        "image_url": "https://a0.muscache.com/pictures/airbnb-platform-assets/AirbnbPlatformAssets-email-dls-icons/original/c3c390ab-d1ab-4627-9cd7-608ac53b171e.png"
       },
       {
-        "title": "Room in Bukit Bintang",
-        "price": "$51\n\u00a0\nfor 2 nights\n$51 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1439884980324015301/original/320a5197-05d3-4696-97b3-0935ebb63887.jpeg?im_w=720"
+        "title": "Apartment in Dhaka",
+        "price": "$245\nShow price breakdown\n\u00a0\nfor 5 nights\n$245 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-973934339954558939/original/06040eaa-c34a-43f7-aeae-5606864a31ba.jpeg?im_w=720"
       },
       {
-        "title": "Condo in Maluri",
-        "price": "$78\n\u00a0\nfor 2 nights\n$78 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1460845333393228577/original/3a3add80-65a3-45e6-b28b-bdf788331c6c.jpeg?im_w=720"
+        "title": "Apartment in Dhaka",
+        "price": "$257\nShow price breakdown\n\u00a0\nfor 5 nights\n$257 for 5 nights",
+        "image_url": "https://a0.muscache.com/pictures/airbnb-platform-assets/AirbnbPlatformAssets-email-dls-icons/original/c3c390ab-d1ab-4627-9cd7-608ac53b171e.png"
       },
       {
-        "title": "Apartment in Kuala Lumpur",
-        "price": "$108\n\u00a0\nfor 2 nights\n$108 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-1542784897437294239/original/46543bee-36e6-4386-a01f-038ba742f123.jpeg?im_w=720"
+        "title": "Apartment in Dhaka",
+        "price": "$149\nShow price breakdown\n\u00a0\nfor 5 nights\n$149 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1551803356852239288/original/36e4c663-a95b-4e45-b3a5-ad8bacf6ac9e.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Bangkok",
-        "price": "$56\n\u00a0\nfor 2 nights\n$56 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-18011265/original/d820d2e9-277a-4511-87a2-06c38860c0bf.jpeg?im_w=720"
+        "title": "Apartment in Dhaka",
+        "price": "$143\nShow price breakdown\n\u00a0\nfor 5 nights\n$143 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1153380542559307401/original/ea8791ce-ccfe-4d79-861b-7f4689c58405.jpeg?im_w=720"
       },
       {
-        "title": "Place to stay in Bang Na",
-        "price": "$44\n\u00a0\nfor 2 nights\n$44 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1556223820440529314/original/e529735c-cfb1-4308-877e-8d8ddae5a2ae.jpeg?im_w=720"
+        "title": "Place to stay in Dhaka",
+        "price": "$70\nShow price breakdown\n\u00a0\nfor 5 nights\n$70 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1540217580025586358/original/18a1e234-f2e9-417e-bfce-51e1218494d1.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Khet Sathon",
-        "price": "$49\n\u00a0\nfor 2 nights\n$49 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/7138522e-e01f-4231-81c6-f8d4d2c320c7.jpg?im_w=720"
+        "title": "Apartment in Dhaka",
+        "price": "$347\nShow price breakdown\n\u00a0\nfor 5 nights\n$347 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1463577810671918613/original/2e11ea75-517e-4803-aa0f-2e5d26e57b4a.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Bangkok",
-        "price": "$63\n\u00a0\nfor 2 nights\n$63 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-12380261/original/9a313e3b-a0e4-43ed-a11d-0a8ccdaa8a2e.jpeg?im_w=720"
+        "title": "Apartment in Panthapath",
+        "price": "$246 \n$204\nShow price breakdown\n\u00a0\nfor 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1522271095383441899/original/18d96759-0c5f-4cfd-88dd-231e0c0549d7.jpeg?im_w=720"
       },
       {
-        "title": "Loft in Watthana",
-        "price": "$116\n\u00a0\nfor 2 nights\n$116 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-1389944706261832869/original/1931b806-d83a-4ef6-a587-80c8bb7fc422.jpeg?im_w=720"
+        "title": "Apartment in Dhaka",
+        "price": "$123 \n$104\nShow price breakdown\n\u00a0\nfor 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-808454002071097473/original/03c8fc7a-afb3-4738-a049-0eb0617aa730.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Bangkok",
-        "price": "$63\n\u00a0\nfor 2 nights\n$63 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/a68da820-8de2-4a1b-b1b8-df39489fad99.jpg?im_w=720"
+        "title": "Apartment in Dhaka",
+        "price": "$245\nShow price breakdown\n\u00a0\nfor 5 nights\n$245 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1475992279227593499/original/36cf4e96-85fc-4dea-b1ab-ee35472f2be9.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Bangkok",
-        "price": "$126\n\u00a0\nfor 2 nights\n$126 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-20869092/original/8752ca11-7199-45a0-802e-24730cc5017e.jpeg?im_w=720"
+        "title": "Apartment in Dhaka",
+        "price": "$200\nShow price breakdown\n\u00a0\nfor 5 nights\n$200 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1599009306854945393/original/23d06ca5-2aac-4bfc-b268-fdf383fde020.jpeg?im_w=720"
       },
       {
-        "title": "Place to stay in Din Daeng",
-        "price": "$58\n\u00a0\nfor 2 nights\n$58 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1597635896574890736/original/5aa58e30-854e-41ba-8507-566c6bcbdcc3.jpeg?im_w=720"
+        "title": "Place to stay in Dhaka",
+        "price": "$101 \n$83\nShow price breakdown\n\u00a0\nfor 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1591459195127962873/original/17e932a3-d14b-48af-8478-993e01beb53e.jpeg?im_w=720"
       },
       {
-        "title": "Guesthouse in Seoul",
-        "price": "$76\n\u00a0\nfor 2 nights\n$76 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-1457249423533314519/original/700ff772-eb9b-4f2c-aa33-aa0e537fbed4.jpeg?im_w=720"
+        "title": "Room in Dhaka",
+        "price": "$82 \n$72\nShow price breakdown\n\u00a0\nfor 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/user/User-395668057/original/b6a97cc8-7cb0-46c7-939f-96c0c57fb72f.jpeg?im_w=720"
       },
       {
-        "title": "Room in Seoul",
-        "price": "$88\n\u00a0\nfor 2 nights\n$88 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/67179e62-f1c2-49e2-9855-c5dd5f8007ba.jpg?im_w=720"
-      },
-      {
-        "title": "Hotel in Seoul",
-        "price": "$88\n\u00a0\nfor 2 nights\n$88 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1576525202632766993/original/fbe7b6cd-acc1-4223-bb10-2d9343e66aed.jpeg?im_w=720"
-      },
-      {
-        "title": "Room in Mapo-gu",
-        "price": "$80\n\u00a0\nfor 2 nights\n$80 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/d1936a44-3993-4478-a174-20d472a6a7a8.jpg?im_w=720"
+        "title": "Apartment in Dhaka",
+        "price": "$229\nShow price breakdown\n\u00a0\nfor 5 nights\n$229 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/b9609158-2130-4719-b5d4-8dc634e2aafe.jpg?im_w=720"
       }
     ],
-    "selected_listing_title": null,
-    "selected_listing_subtitle": null,
-    "selected_listing_images": null
+    "selected_listing_title": "Aroma Garden- Modern & Sunny City Escape",
+    "selected_listing_subtitle": "",
+    "selected_listing_images": [
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1352110899876219520/original/5af131a1-ba4c-49b8-8079-e400ce45e4eb.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1352110899876219520/original/666051ea-d4f5-4ff9-825d-213c1d52029b.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1352110899876219520/original/9bf9646e-105a-4de2-aba0-034f90a27c24.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1352110899876219520/original/881dcb57-0970-4672-96ff-7cff42bff9d7.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1352110899876219520/original/ee586dc7-ce54-405a-a7b2-9d075273037b.jpeg?im_w=720"
+    ]
   }
 }

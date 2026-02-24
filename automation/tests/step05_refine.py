@@ -14,12 +14,14 @@ import time
 from urllib.parse import parse_qs, urlparse
 
 from automation.tests.base import BaseTestStep
-from automation.db_logger import save_listings
+from automation.db_logger import save_listings, run_in_thread
 from automation.models import ResultModel
 
 
 class Step05RefineSearch(BaseTestStep):
     name = "Refine Button Date Validation Test"
+    STEP04_RESULT_NAME = "Guest Picker Interaction Test"
+    STEP03_RESULT_NAME = "Date Picker Modal Open and Visibility Test"
 
     LISTING_CARD_SELECTORS = [
         '[data-testid="listing-card-wrapper"]',
@@ -97,9 +99,99 @@ class Step05RefineSearch(BaseTestStep):
         has_checkout = bool(re.search(rf"\b0?{re.escape(checkout_day)}\b", normalized))
         return has_checkin and has_checkout
 
+    def _restore_context_from_db(self) -> bool:
+        fields = [
+            "selected_location",
+            "selected_month",
+            "checkin_date",
+            "checkout_date",
+            "comment",
+        ]
+
+        def _fetch(test_name: str):
+            return (
+                ResultModel.objects.filter(test_case=test_name, passed=True)
+                .order_by("-created_at")
+                .values(*fields)
+                .first()
+            )
+
+        payload_step04 = None
+        payload_step03 = None
+        try:
+            payload_step04 = run_in_thread(lambda: _fetch(self.STEP04_RESULT_NAME))
+        except Exception:
+            payload_step04 = None
+        try:
+            payload_step03 = run_in_thread(lambda: _fetch(self.STEP03_RESULT_NAME))
+        except Exception:
+            payload_step03 = None
+
+        restored = False
+        payloads = [payload_step04, payload_step03]
+        for payload in payloads:
+            if not payload:
+                continue
+            if payload.get("selected_location") and not self.shared_state.get("selected_location"):
+                self.shared_state["selected_location"] = payload.get("selected_location")
+                restored = True
+            if payload.get("selected_month") and not self.shared_state.get("selected_month"):
+                self.shared_state["selected_month"] = payload.get("selected_month")
+                restored = True
+            if payload.get("checkin_date") and not self.shared_state.get("checkin_date"):
+                self.shared_state["checkin_date"] = payload.get("checkin_date")
+                restored = True
+            if payload.get("checkout_date") and not self.shared_state.get("checkout_date"):
+                self.shared_state["checkout_date"] = payload.get("checkout_date")
+                restored = True
+
+        # Guest count is not a DB field, but Step 04 comment includes it.
+        if not self.shared_state.get("guest_count") and payload_step04:
+            comment = payload_step04.get("comment") or ""
+            guest_count_match = re.search(r"Search guest count:\s*(\d+)", comment, re.IGNORECASE)
+            if guest_count_match:
+                self.shared_state["guest_count"] = int(guest_count_match.group(1))
+                restored = True
+            breakdown_match = re.search(
+                r"adults=(\d+),\s*children=(\d+),\s*infants=(\d+),\s*pets=(\d+)",
+                comment,
+                re.IGNORECASE,
+            )
+            if breakdown_match and not self.shared_state.get("guest_breakdown"):
+                self.shared_state["guest_breakdown"] = {
+                    "adults": int(breakdown_match.group(1)),
+                    "children": int(breakdown_match.group(2)),
+                    "infants": int(breakdown_match.group(3)),
+                    "pets": int(breakdown_match.group(4)),
+                }
+                restored = True
+
+        return restored
+
+    def _ensure_context(self) -> None:
+        if not self.shared_state.get("selected_location"):
+            self.shared_state["selected_location"] = (
+                self.shared_state.get("chosen_suggestion")
+                or self.shared_state.get("selected_country")
+                or ""
+            )
+
+        missing_dates = not (
+            (self.shared_state.get("checkin_date") or "").strip()
+            and (self.shared_state.get("checkout_date") or "").strip()
+        )
+        missing_location = not (self.shared_state.get("selected_location") or "").strip()
+        missing_guest = int(self.shared_state.get("guest_count") or 0) <= 0
+        if missing_dates or missing_location or missing_guest:
+            restored = self._restore_context_from_db()
+            if restored:
+                print("  Restored context for Step 05 from DB backup.")
+                self.checkpoint("step05_context_restored_from_db")
+
     def run(self) -> ResultModel:
         print("\n[Step 05] Refine Search and Item List Verification...")
         self.restore_checkpoint()
+        self._ensure_context()
         self.safe_dismiss_popups()
 
         # Wait for navigation to search results page
@@ -252,6 +344,11 @@ class Step05RefineSearch(BaseTestStep):
         )
 
         selected_guest_total = self._extract_first_int(str(guests)) or 0
+        if selected_guest_total <= 0 and url_guest_total > 0:
+            # If refresh cleared checkpoint guest count, use URL-applied guests.
+            selected_guest_total = url_guest_total
+            self.shared_state["guest_count"] = url_guest_total
+
         expected_ui_guest_total = selected_guest_total
         expected_url_guest_total = selected_guest_total
 
@@ -300,6 +397,14 @@ class Step05RefineSearch(BaseTestStep):
             f"Listings scraped: {len(listings)}."
         )
 
-        result = self.save(passed, comment, screenshot_path)
+        result = self.save(
+            passed,
+            comment,
+            screenshot_path,
+            selected_location=(self.shared_state.get("selected_location") or ""),
+            selected_month=(self.shared_state.get("selected_month") or ""),
+            checkin_date=(self.shared_state.get("checkin_date") or ""),
+            checkout_date=(self.shared_state.get("checkout_date") or ""),
+        )
         save_listings(result, listings)
         return result
