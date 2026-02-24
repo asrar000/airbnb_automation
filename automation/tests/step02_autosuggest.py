@@ -103,9 +103,6 @@ class Step02AutoSuggestion(BaseTestStep):
         suggestions = self.shared_state.get("pre_scraped_suggestions", [])
         chosen = self.shared_state.get("chosen_suggestion", "")
 
-        # Take screenshot while date picker may be opening from Step 01 click
-        screenshot_path = self.screenshot("step02_suggestions")
-
         if not suggestions:
             suggestions = self._read_live_suggestions()
             if suggestions:
@@ -116,7 +113,6 @@ class Step02AutoSuggestion(BaseTestStep):
             return self.save(
                 False,
                 f"No suggestions were captured during Step 01 for '{country}'.",
-                screenshot_path,
             )
 
         print(f"  {len(suggestions)} suggestions captured from Step 01.")
@@ -141,7 +137,7 @@ class Step02AutoSuggestion(BaseTestStep):
 
         # Pass if suggestions are relevant; map icon check is informational
         passed = relevant and len(suggestions) > 0
-        result = self.save(passed, comment, screenshot_path)
+        result = self.save(passed, comment)
 
         # Save all suggestion items to DB
         save_suggestions(result, suggestions)

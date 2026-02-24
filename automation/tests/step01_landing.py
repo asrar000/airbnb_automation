@@ -467,10 +467,8 @@ class Step01LandingAndSearch(BaseTestStep):
 
         title = self.page.title()
         homepage_ok = "airbnb" in title.lower()
-        screenshot_path = self.screenshot("step01_homepage")
-
         if not homepage_ok:
-            return self.save(False, f"Homepage did not load. Title: {title}", screenshot_path)
+            return self.save(False, f"Homepage did not load. Title: {title}")
 
         destination = random.choice(TOP_SEARCH_DESTINATIONS)
         self.shared_state["selected_country"] = destination
@@ -557,13 +555,10 @@ class Step01LandingAndSearch(BaseTestStep):
             print(f"  Attempt {attempt + 1}: no suggestions yet...")
 
         self.shared_state["pre_scraped_suggestions"] = suggestions
-        screenshot_path2 = self.screenshot("step01_typed_country")
-
         if not suggestions:
             return self.save(
                 False,
                 f"Homepage loaded, but suggestions did not appear for '{destination}'.",
-                screenshot_path2,
                 selected_location=destination,
             )
 
@@ -602,7 +597,6 @@ class Step01LandingAndSearch(BaseTestStep):
                 False,
                 f"Suggestions appeared ({len(suggestions)}), but selecting "
                 f"'{chosen_text}' failed (click + Enter fallback).",
-                screenshot_path2,
                 selected_location=destination,
             )
 
@@ -610,6 +604,5 @@ class Step01LandingAndSearch(BaseTestStep):
             True,
             f"Homepage loaded. Title: '{title}'. Destination '{destination}' typed. "
             f"Suggestions: {len(suggestions)}. Selected: '{chosen_text}' via {selection_method}.",
-            screenshot_path2,
             selected_location=chosen_text or destination,
         )

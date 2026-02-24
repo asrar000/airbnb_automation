@@ -1075,11 +1075,9 @@ class Step03DatePicker(BaseTestStep):
         destination_ok = self._restore_destination_if_needed()
         print(f"  Destination ready for Step 03: {destination_ok}")
         if not destination_ok:
-            screenshot_path = self.screenshot("step03_destination_missing")
             return self.save(
                 False,
                 "Destination missing before Step 03 and restore from checkpoint failed.",
-                screenshot_path,
             )
 
         max_selection_attempts = 8
@@ -1239,14 +1237,10 @@ class Step03DatePicker(BaseTestStep):
 
             print("  Date values were not valid after a single selection attempt, retrying...")
 
-        screenshot_path = self.screenshot("step03_datepicker_open")
-        screenshot_path2 = self.screenshot("step03_dates_selected")
-
         if not picker_visible:
             return self.save(
                 False,
                 "Date picker modal could not be found after repeated retries.",
-                screenshot_path,
             )
 
         self.shared_state["selected_month"] = month_label
@@ -1274,7 +1268,6 @@ class Step03DatePicker(BaseTestStep):
         return self.save(
             dates_ok,
             comment,
-            screenshot_path2,
             selected_location=selected_location,
             selected_month=month_label,
             checkin_date=checkin_date,

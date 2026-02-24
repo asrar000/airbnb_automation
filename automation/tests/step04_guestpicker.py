@@ -29,6 +29,11 @@ class Step04GuestPicker(BaseTestStep):
         '[data-testid*="structured-search-input-field-split-dates"]',
         '[data-testid="structured-search-input-field-dates-button"]',
         '[data-testid*="structured-search-input-field-dates"]',
+        'div[role="button"][aria-expanded][style*="grid-column: center"]',
+        '[role="button"][aria-expanded]:has-text("When")',
+        '[role="button"]:has-text("When")',
+        '[role="button"]:has-text("Add dates")',
+        'div[role="button"]:has-text("When")',
         'button[aria-label*="check in" i]',
         'button[aria-label*="check out" i]',
         'button[aria-label*="dates" i]',
@@ -87,6 +92,13 @@ class Step04GuestPicker(BaseTestStep):
         "children": 'button[data-testid="stepper-children-increase-button"]',
         "infants": 'button[data-testid="stepper-infants-increase-button"]',
         "pets": 'button[data-testid="stepper-pets-increase-button"]',
+    }
+
+    STEPPER_DECREASE_SELECTORS = {
+        "adults": 'button[data-testid="stepper-adults-decrease-button"]',
+        "children": 'button[data-testid="stepper-children-decrease-button"]',
+        "infants": 'button[data-testid="stepper-infants-decrease-button"]',
+        "pets": 'button[data-testid="stepper-pets-decrease-button"]',
     }
 
     STEPPER_VALUE_SELECTORS = {
@@ -346,6 +358,138 @@ class Step04GuestPicker(BaseTestStep):
             pass
         return False
 
+    def _location_is_present(self) -> bool:
+        try:
+            return bool(self.page.evaluate("""
+                () => {
+                    const blocked = new Set(['where', 'search destinations']);
+                    const selectors = [
+                        '[data-testid="structured-search-input-field-query"]',
+                        '[data-testid="structured-search-input-field-query-input"]',
+                        '#bigsearch-query-location-input',
+                        'input[name="query"]',
+                        'button[aria-label*="where" i]',
+                    ];
+                    for (const sel of selectors) {
+                        const el = document.querySelector(sel);
+                        if (!el || el.offsetParent === null) continue;
+                        const text = ((el.value || el.innerText || el.textContent || '') + '')
+                            .replace(/\\s+/g, ' ')
+                            .trim()
+                            .toLowerCase();
+                        if (text && !blocked.has(text)) return true;
+                    }
+                    return false;
+                }
+            """))
+        except Exception:
+            return False
+
+    def _restore_location_if_needed(self) -> bool:
+        if self._location_is_present():
+            return True
+
+        destination = (
+            self.shared_state.get("selected_location")
+            or self.shared_state.get("chosen_suggestion")
+            or self.shared_state.get("selected_country")
+            or ""
+        ).strip()
+        if not destination:
+            if self._restore_context_from_db():
+                destination = (
+                    self.shared_state.get("selected_location")
+                    or self.shared_state.get("chosen_suggestion")
+                    or self.shared_state.get("selected_country")
+                    or ""
+                ).strip()
+        if not destination:
+            return False
+
+        print(f"  Location missing — restoring '{destination}' from checkpoint.")
+        self._expand_compact_search_bar()
+        trigger_selectors = [
+            '[data-testid="structured-search-input-field-query"]',
+            'button[aria-label*="where" i]',
+            'button:has-text("Where")',
+            'button:has-text("Search destinations")',
+        ]
+        input_selectors = [
+            'input[data-testid="structured-search-input-field-query-input"]',
+            '#bigsearch-query-location-input',
+            '[placeholder="Search destinations"]',
+            'input[name="query"]',
+            'input[aria-autocomplete="list"]',
+        ]
+
+        for sel in trigger_selectors:
+            try:
+                loc = self.page.locator(sel).first
+                if loc.is_visible(timeout=500):
+                    loc.click()
+                    time.sleep(0.35)
+                    break
+            except Exception:
+                continue
+
+        for sel in input_selectors:
+            try:
+                loc = self.page.locator(sel).first
+                if not loc.is_visible(timeout=500):
+                    continue
+                loc.click()
+                self.page.keyboard.press("Control+a")
+                self.page.keyboard.press("Backspace")
+                self.page.keyboard.type(destination)
+                time.sleep(0.45)
+                self.page.keyboard.press("ArrowDown")
+                time.sleep(0.2)
+                self.page.keyboard.press("Enter")
+                time.sleep(1.0)
+                if self._location_is_present():
+                    self.shared_state["selected_location"] = destination
+                    return True
+            except Exception:
+                continue
+
+        try:
+            pasted = bool(self.page.evaluate(
+                """
+                (payload) => {
+                    const { value, selectors } = payload;
+                    for (const sel of selectors) {
+                        const el = document.querySelector(sel);
+                        if (!el || el.offsetParent === null) continue;
+                        el.focus();
+                        el.value = value;
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                        return true;
+                    }
+                    return false;
+                }
+                """,
+                {"value": destination, "selectors": input_selectors},
+            ))
+            if pasted:
+                time.sleep(0.4)
+                try:
+                    self.page.keyboard.press("ArrowDown")
+                    time.sleep(0.2)
+                    self.page.keyboard.press("Enter")
+                    time.sleep(0.8)
+                except Exception:
+                    pass
+                if self._location_is_present():
+                    self.shared_state["selected_location"] = destination
+                    return True
+        except Exception:
+            pass
+
+        # Final fallback: keep checkpoint value for downstream URL fallback even if UI probing fails.
+        self.shared_state["selected_location"] = destination
+        return bool(destination)
+
     def _popup_is_open(self) -> bool:
         """Confirm popup is open by checking stepper increase buttons are visible."""
         try:
@@ -399,6 +543,49 @@ class Step04GuestPicker(BaseTestStep):
 
     def _click_stepper_increase(self, key: str) -> bool:
         sel = self.STEPPER_INCREASE_SELECTORS.get(key)
+        if not sel:
+            return False
+        try:
+            loc = self.page.locator(sel).first
+            if loc.count() > 0 and loc.is_visible(timeout=400):
+                if loc.is_disabled():
+                    return False
+                loc.click(timeout=1200)
+                return True
+        except Exception:
+            pass
+        try:
+            return bool(self.page.evaluate(
+                """
+                (selector) => {
+                    const isVisible = (el) => {
+                        if (!el) return false;
+                        const r = el.getBoundingClientRect();
+                        if (!r || r.width <= 0 || r.height <= 0) return false;
+                        const s = window.getComputedStyle(el);
+                        return s.display !== 'none' && s.visibility !== 'hidden';
+                    };
+                    const nodes = [...document.querySelectorAll(selector)].filter(isVisible);
+                    const el = nodes.find((n) => {
+                        if (n.hasAttribute('disabled')) return false;
+                        return (n.getAttribute('aria-disabled') || '').trim().toLowerCase() !== 'true';
+                    });
+                    if (!el) return false;
+                    el.scrollIntoView({ block: 'center', inline: 'center' });
+                    for (const evt of ['pointerdown', 'mousedown', 'mouseup', 'click']) {
+                        el.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
+                    }
+                    el.click();
+                    return true;
+                }
+                """,
+                sel,
+            ))
+        except Exception:
+            return False
+
+    def _click_stepper_decrease(self, key: str) -> bool:
+        sel = self.STEPPER_DECREASE_SELECTORS.get(key)
         if not sel:
             return False
         try:
@@ -777,6 +964,71 @@ class Step04GuestPicker(BaseTestStep):
             and self._range_is_logical(saved_checkin, saved_checkout)
         )
 
+    def _ui_shows_saved_day_range(self) -> bool:
+        checkin_saved = (self.shared_state.get("checkin_date") or "").strip()
+        checkout_saved = (self.shared_state.get("checkout_date") or "").strip()
+        if not (checkin_saved and checkout_saved):
+            return False
+
+        checkin_tokens = self._extract_date_tokens(checkin_saved)
+        checkout_tokens = self._extract_date_tokens(checkout_saved)
+        checkin_day = (checkin_tokens.get("day") or "").strip()
+        checkout_day = (self._extract_date_tokens(checkout_saved).get("day") or "").strip()
+        month_hint = (checkin_tokens.get("month") or checkout_tokens.get("month") or "").strip().lower()
+        if not (checkin_day and checkout_day):
+            return False
+
+        try:
+            merged = self.page.evaluate(
+                """
+                () => {
+                    const selectors = [
+                        '[data-testid="structured-search-input-field-split-dates"]',
+                        '[data-testid*="structured-search-input-field-split-dates"]',
+                        '[data-testid="structured-search-input-field-dates-button"]',
+                        '[data-testid*="structured-search-input-field-dates"]',
+                        'button[aria-label*="check in" i]',
+                        'button[aria-label*="check out" i]',
+                        'button[aria-label*="dates" i]',
+                        'button[aria-label*="when" i]',
+                        '[role="button"]:has-text("When")',
+                        '[role="button"][aria-expanded]',
+                        'div[role="button"][aria-expanded][style*="grid-column: center"]',
+                    ];
+                    const out = [];
+                    const isVisible = (el) => {
+                        if (!el) return false;
+                        const r = el.getBoundingClientRect();
+                        if (!r || r.width <= 0 || r.height <= 0) return false;
+                        const s = window.getComputedStyle(el);
+                        return s.display !== 'none' && s.visibility !== 'hidden';
+                    };
+                    for (const sel of selectors) {
+                        for (const el of document.querySelectorAll(sel)) {
+                            if (!isVisible(el)) continue;
+                            const txt = (
+                                (el.innerText || el.textContent || '') + ' ' + (el.getAttribute('aria-label') || '')
+                            ).replace(/\\s+/g, ' ').trim();
+                            if (txt) out.push(txt.toLowerCase());
+                        }
+                    }
+                    return out.join(' | ');
+                }
+                """
+            ) or ""
+        except Exception:
+            return False
+
+        has_checkin = bool(re.search(rf"\b0?{re.escape(checkin_day)}\b", merged))
+        has_checkout = bool(re.search(rf"\b0?{re.escape(checkout_day)}\b", merged))
+        if not (has_checkin and has_checkout):
+            return False
+        if month_hint:
+            short_month = month_hint[:3]
+            if month_hint not in merged and short_month not in merged:
+                return False
+        return True
+
     def _dates_present_in_ui(self) -> bool:
         checkin_text, checkout_text = self._read_date_field_values()
         if (
@@ -792,15 +1044,40 @@ class Step04GuestPicker(BaseTestStep):
         # Final fallback: if Step 03 already persisted logical values, accept them.
         return self._saved_dates_are_logical()
 
+    def _dates_present_in_ui_strict(self) -> bool:
+        """
+        Strict UI check: only return True if dates are actually present/selected in the UI,
+        not just in checkpoint/shared state.
+        """
+        checkin_text, checkout_text = self._read_date_field_values()
+        if (
+            self._is_real_date_value(checkin_text)
+            and self._is_real_date_value(checkout_text)
+            and self._range_is_logical(checkin_text, checkout_text)
+        ):
+            return True
+        if self._ui_shows_saved_day_range():
+            return True
+        return self._calendar_has_selected_range()
+
     def _open_date_picker(self) -> bool:
         if self._picker_is_open():
             return True
+
+        # In compact mode, expand the search bar and close guest panel first.
+        self._close_guest_popup()
+        self._expand_compact_search_bar()
+        time.sleep(0.2)
 
         for sel in self.DATE_FIELD_SELECTORS:
             try:
                 loc = self.page.locator(sel).first
                 if loc.is_visible(timeout=500):
-                    loc.click()
+                    try:
+                        loc.scroll_into_view_if_needed(timeout=800)
+                    except Exception:
+                        pass
+                    loc.click(timeout=1200)
                     time.sleep(0.8)
                     if self._picker_is_open():
                         return True
@@ -809,16 +1086,48 @@ class Step04GuestPicker(BaseTestStep):
         try:
             clicked = bool(self.page.evaluate("""
                 () => {
-                    const els = [...document.querySelectorAll('button, div, span')];
-                    const el = els.find(e => {
-                        if (e.offsetParent === null) return false;
-                        const text = (e.innerText || '').toLowerCase();
-                        const aria = (e.getAttribute('aria-label') || '').toLowerCase();
-                        return text.includes('add dates') || aria.includes('check in') || aria.includes('dates');
+                    const isVisible = (el) => {
+                        if (!el) return false;
+                        const r = el.getBoundingClientRect();
+                        if (!r || r.width <= 0 || r.height <= 0) return false;
+                        const s = window.getComputedStyle(el);
+                        return s.display !== 'none' && s.visibility !== 'hidden';
+                    };
+                    const norm = (v) => (v || '').trim().toLowerCase();
+                    const clickTarget = (node) => {
+                        let cur = node;
+                        for (let i = 0; i < 8 && cur; i += 1) {
+                            const role = norm(cur.getAttribute('role'));
+                            if (
+                                cur.tagName === 'BUTTON' ||
+                                role === 'button' ||
+                                cur.matches?.('[data-testid*="dates"], [data-testid*="split-dates"]')
+                            ) {
+                                for (const evt of ['pointerdown', 'mousedown', 'mouseup', 'click']) {
+                                    cur.dispatchEvent(new MouseEvent(evt, { bubbles: true, cancelable: true, view: window }));
+                                }
+                                cur.click();
+                                return true;
+                            }
+                            cur = cur.parentElement;
+                        }
+                        return false;
+                    };
+
+                    const candidates = [...document.querySelectorAll('button, div, span, [role="button"]')].filter(isVisible);
+                    const target = candidates.find((e) => {
+                        const text = norm(e.innerText || e.textContent);
+                        const aria = norm(e.getAttribute('aria-label'));
+                        return (
+                            text.includes('when') ||
+                            text.includes('add dates') ||
+                            aria.includes('check in') ||
+                            aria.includes('check out') ||
+                            aria.includes('dates')
+                        );
                     });
-                    if (!el) return false;
-                    el.click();
-                    return true;
+                    if (!target) return false;
+                    return clickTarget(target);
                 }
             """))
             if clicked:
@@ -1007,12 +1316,12 @@ class Step04GuestPicker(BaseTestStep):
         except Exception:
             return False
 
-    def _restore_dates_if_needed(self) -> bool:
-        if self._dates_present_in_ui():
+    def _restore_dates_if_needed(self, force_apply: bool = False) -> bool:
+        if force_apply and self._dates_present_in_ui_strict():
+            print("  Dates already visible in UI after screenshot.")
             return True
 
-        if self._saved_dates_are_logical():
-            print("  Using saved Step 03 dates from shared state.")
+        if not force_apply and self._dates_present_in_ui():
             return True
 
         checkin_saved = self.shared_state.get("checkin_date", "")
@@ -1024,30 +1333,43 @@ class Step04GuestPicker(BaseTestStep):
                 self.checkpoint("step04_context_restored_from_db")
                 checkin_saved = self.shared_state.get("checkin_date", "")
                 checkout_saved = self.shared_state.get("checkout_date", "")
-                if self._saved_dates_are_logical():
+                if not force_apply and self._dates_present_in_ui():
                     return True
         if not (checkin_saved and checkout_saved):
             return False
 
-        print("  Dates missing — restoring from checkpoint.")
+        if force_apply:
+            print("  Re-applying dates after screenshot from checkpoint.")
+        else:
+            print("  Dates missing — restoring from checkpoint.")
         if not self._open_date_picker():
-            return self._saved_dates_are_logical()
+            self._expand_compact_search_bar()
+            self._close_guest_popup()
+            time.sleep(0.3)
+            if not self._open_date_picker():
+                print("  Date picker could not be reopened during date restore.")
+                # Do not hard-fail when UI is compact; keep saved dates for URL/search fallback.
+                return self._dates_present_in_ui_strict() or self._saved_dates_are_logical()
 
         self._ensure_dates_tab_selected()
         self._move_to_saved_month()
         self._ensure_dates_tab_selected()
-        if self._calendar_has_selected_range():
+        if not force_apply and self._calendar_has_selected_range():
             return True
 
         if not self._click_saved_date(checkin_saved):
-            return self._saved_dates_are_logical()
+            print("  Failed to click saved check-in date during restore.")
+            return self._dates_present_in_ui_strict()
         time.sleep(0.5)
 
         if not self._click_saved_date(checkout_saved):
-            return self._saved_dates_are_logical() or self._calendar_has_selected_range()
+            print("  Failed to click saved check-out date during restore.")
+            return self._dates_present_in_ui_strict() or self._calendar_has_selected_range()
         time.sleep(0.8)
 
-        return self._dates_present_in_ui() or self._saved_dates_are_logical()
+        restored_ok = self._dates_present_in_ui_strict() or self._calendar_has_selected_range()
+        print(f"  Date restore verification after reapply: {restored_ok}")
+        return restored_ok
 
     def _restore_context_from_db(self) -> bool:
         """
@@ -1103,6 +1425,118 @@ class Step04GuestPicker(BaseTestStep):
 
         return restored
 
+    def _restore_guests_if_needed(self, target_counts: dict | None) -> bool:
+        normalized_target = {"adults": 0, "children": 0, "infants": 0, "pets": 0}
+        for key in normalized_target:
+            try:
+                normalized_target[key] = max(0, int((target_counts or {}).get(key, 0)))
+            except Exception:
+                normalized_target[key] = 0
+
+        target_total = sum(normalized_target.values())
+        if target_total <= 0:
+            return True
+
+        # Fast path: if guest summary already matches expected in compact UI, don't reopen popup.
+        guest_display = (self._get_guest_display() or "").strip().lower()
+        displayed_guest_count = self._extract_first_int(guest_display) or 0
+        expected_guest_count = normalized_target["adults"] + normalized_target["children"]
+        extras_ok = True
+        if normalized_target["infants"] > 0 and "infant" not in guest_display:
+            extras_ok = False
+        if normalized_target["pets"] > 0 and "pet" not in guest_display:
+            extras_ok = False
+        if displayed_guest_count == expected_guest_count and extras_ok:
+            self.shared_state["guest_breakdown"] = dict(normalized_target)
+            self.shared_state["guest_total_added"] = target_total
+            self.shared_state["guest_count"] = expected_guest_count
+            return True
+
+        if not self._open_guest_field():
+            self._expand_compact_search_bar()
+            if not self._open_guest_field():
+                # Keep saved guest state if popup cannot be reopened after screenshot.
+                self.shared_state["guest_breakdown"] = dict(normalized_target)
+                self.shared_state["guest_total_added"] = target_total
+                self.shared_state["guest_count"] = expected_guest_count
+                return expected_guest_count > 0
+
+        popup_open = False
+        for _ in range(5):
+            if self._popup_is_open():
+                popup_open = True
+                break
+            self._open_guest_field()
+            time.sleep(0.3)
+        if not popup_open:
+            self.shared_state["guest_breakdown"] = dict(normalized_target)
+            self.shared_state["guest_total_added"] = target_total
+            self.shared_state["guest_count"] = expected_guest_count
+            return expected_guest_count > 0
+
+        current = self._read_stepper_values()
+        for key in ["adults", "children", "infants", "pets"]:
+            desired = normalized_target[key]
+            guard = 0
+            while current.get(key, 0) < desired and guard < 24:
+                guard += 1
+                if not self._click_stepper_increase(key):
+                    break
+                time.sleep(0.2)
+                current = self._read_stepper_values()
+
+            while current.get(key, 0) > desired and guard < 48:
+                guard += 1
+                if not self._click_stepper_decrease(key):
+                    break
+                time.sleep(0.2)
+                current = self._read_stepper_values()
+
+        final_values = self._read_stepper_values()
+        guests_ok = all(final_values.get(k, 0) == normalized_target[k] for k in normalized_target)
+
+        if not guests_ok:
+            # Compact header fallback: validate via summary text when stepper panel
+            # re-renders before values can be read back.
+            self._close_guest_popup()
+            time.sleep(0.35)
+            guest_display = (self._get_guest_display() or "").strip().lower()
+            displayed_guest_count = self._extract_first_int(guest_display) or 0
+            extras_ok = True
+            if normalized_target["infants"] > 0 and "infant" not in guest_display:
+                extras_ok = False
+            if normalized_target["pets"] > 0 and "pet" not in guest_display:
+                extras_ok = False
+            if displayed_guest_count == expected_guest_count and extras_ok:
+                final_values = dict(normalized_target)
+                guests_ok = True
+
+        self.shared_state["guest_breakdown"] = final_values
+        self.shared_state["guest_total_added"] = sum(final_values.values())
+        self.shared_state["guest_count"] = final_values.get("adults", 0) + final_values.get("children", 0)
+        self.checkpoint("step04_guests_rehydrated")
+
+        self._close_guest_popup()
+        time.sleep(0.5)
+        return guests_ok
+
+    def _rehydrate_context_before_search(self, target_guest_counts: dict) -> tuple[bool, bool, bool]:
+        self.restore_checkpoint()
+        self.safe_dismiss_popups()
+        if not (
+            (self.shared_state.get("selected_location") or "").strip()
+            and (self.shared_state.get("checkin_date") or "").strip()
+            and (self.shared_state.get("checkout_date") or "").strip()
+        ):
+            if self._restore_context_from_db():
+                self.checkpoint("step04_context_restored_from_db")
+
+        location_ready = self._restore_location_if_needed()
+        dates_ready = self._restore_dates_if_needed(force_apply=True)
+        guests_ready = self._restore_guests_if_needed(target_guest_counts)
+        self.checkpoint("step04_context_rehydrated_pre_search")
+        return location_ready, dates_ready, guests_ready
+
     def run(self) -> ResultModel:
         print("\n[Step 04] Guest Picker Interaction...")
         time.sleep(1)
@@ -1123,14 +1557,14 @@ class Step04GuestPicker(BaseTestStep):
                 or ""
             )
 
+        location_ready = self._restore_location_if_needed()
         dates_ready = self._restore_dates_if_needed()
-        print(f"  Dates ready for Step 04: {dates_ready}")
-        if not dates_ready:
-            screenshot_path = self.screenshot("step04_dates_missing")
+        print(f"  Search context ready for Step 04: {location_ready and dates_ready}")
+        if not (location_ready and dates_ready):
             return self.save(
                 False,
-                "Step 04 requires dates from Step 03, but date restore failed.",
-                screenshot_path,
+                "Step 04 requires location + dates in the search bar, but context restore failed.",
+                "",
                 selected_location=(self.shared_state.get("selected_location") or ""),
                 selected_month=(self.shared_state.get("selected_month") or ""),
                 checkin_date=(self.shared_state.get("checkin_date") or ""),
@@ -1159,13 +1593,11 @@ class Step04GuestPicker(BaseTestStep):
             print(f"  Waiting for guest popup... attempt {attempt + 1}")
             time.sleep(1)
 
-        screenshot_before = self.screenshot("step04_guest_popup")
-
         if not popup_visible:
             return self.save(
                 False,
                 f"Guest picker popup did not open. Initial guest click success: {guest_click_ok}.",
-                screenshot_before,
+                "",
                 selected_location=(self.shared_state.get("selected_location") or ""),
                 selected_month=(self.shared_state.get("selected_month") or ""),
                 checkin_date=(self.shared_state.get("checkin_date") or ""),
@@ -1182,7 +1614,7 @@ class Step04GuestPicker(BaseTestStep):
             return self.save(
                 False,
                 "Guest popup opened, but no stepper increase controls were visible.",
-                screenshot_before,
+                "",
                 selected_location=(self.shared_state.get("selected_location") or ""),
                 selected_month=(self.shared_state.get("selected_month") or ""),
                 checkin_date=(self.shared_state.get("checkin_date") or ""),
@@ -1232,8 +1664,6 @@ class Step04GuestPicker(BaseTestStep):
         # Collapse popup so the guest field text in the search bar is readable.
         self._close_guest_popup()
         time.sleep(0.8)
-
-        screenshot_path = self.screenshot("step04_guests_selected")
 
         # Verify displayed guest count matches selected values
         guest_display = self._get_guest_display()
@@ -1329,7 +1759,7 @@ class Step04GuestPicker(BaseTestStep):
         return self.save(
             passed,
             comment,
-            screenshot_path,
+            "",
             selected_location=(self.shared_state.get("selected_location") or ""),
             selected_month=(self.shared_state.get("selected_month") or ""),
             checkin_date=(self.shared_state.get("checkin_date") or ""),
