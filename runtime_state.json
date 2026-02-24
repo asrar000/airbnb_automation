@@ -1,120 +1,124 @@
 {
   "step": "step06_listing_detail_collected",
-  "saved_at": "2026-02-24T09:02:53.611862+00:00",
+  "saved_at": "2026-02-24T09:32:22.704303+00:00",
   "state": {
     "target_url": "https://www.airbnb.com/",
-    "selected_country": "Dubai",
-    "chosen_suggestion": "Dubai Marina",
-    "selected_location": "Dubai Marina",
-    "chosen_suggestion_index": 2,
+    "selected_country": "Lisbon",
+    "chosen_suggestion": "Arroios",
+    "selected_location": "Arroios",
+    "chosen_suggestion_index": 3,
     "destination_committed": true,
     "selected_month": "September 2026",
     "checkin_date": "16, Wednesday, September 2026. Selected check-in date.",
-    "checkout_date": "21, Monday, September 2026. Selected checkout date.",
+    "checkout_date": "18, Friday, September 2026. Selected checkout date.",
     "guest_count": 3,
     "guest_breakdown": {
-      "adults": 3,
-      "children": 0,
-      "infants": 1,
-      "pets": 0
+      "adults": 1,
+      "children": 2,
+      "infants": 0,
+      "pets": 1
     },
     "guest_total_added": 4,
     "listings": [
       {
-        "title": "Apartment in Dubai",
-        "price": "$952 \n$790\nShow price breakdown\n\u00a0\nfor 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-52606784/original/a25e1b67-1f54-4332-9f5e-3c09775b3736.jpeg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$266\nShow price breakdown\n\u00a0\nfor 2 nights\n$266 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-41146720/original/ebac4975-2300-427a-9f0a-4239d0201194.jpeg?im_w=720"
       },
       {
-        "title": "Condo in Dubai",
-        "price": "$968\nShow price breakdown\n\u00a0\nfor 5 nights\n$968 for 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1562929062371017434/original/2b78eb3b-66e4-4495-88c0-e62d02a3c1e0.jpeg?im_w=720"
+        "title": "Place to stay in Lisbon",
+        "price": "$118\nShow price breakdown\n\u00a0\nfor 2 nights\n$118 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1480432939766002141/original/5ccaab44-e5dc-4475-b1ee-d7e1b616355b.jpeg?im_w=720"
       },
       {
-        "title": "Condo in Dubai",
-        "price": "$876\nShow price breakdown\n\u00a0\nfor 5 nights\n$876 for 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MjgzMzQ3OA%3D%3D/original/57557ab5-f080-426c-824a-1758d90493b6.jpeg?im_w=720"
+        "title": "Place to stay in Lisbon",
+        "price": "$272\nShow price breakdown\n\u00a0\nfor 2 nights\n$272 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1157406601913478445/original/35eca534-b10f-4cea-9b97-3db3b4944e1a.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$582\nShow price breakdown\n\u00a0\nfor 5 nights\n$582 for 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6Mjc2NzY4MzE%3D/original/3fa30bf6-f992-4b72-b872-21c2c8d56374.jpeg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$476\nShow price breakdown\n\u00a0\nfor 2 nights\n$476 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/66a90e9e-1fb1-4f1e-b0b1-41fe5e8c1bd2.jpg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$1,218\nShow price breakdown\n\u00a0\nfor 5 nights\n$1,218 for 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTM1NTg3MzUxNTgxNDY1OTc4MA%3D%3D/original/671bd694-b7ab-458e-894a-26a242ab29be.jpeg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$320\nShow price breakdown\n\u00a0\nfor 2 nights\n$320 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1390762774837079687/original/3d17f8c2-fe6c-4acf-8bae-336a98fd49e7.jpeg?im_w=720"
       },
       {
-        "title": "Condo in Dubai",
-        "price": "$1,065 \n$966\nShow price breakdown\n\u00a0\nfor 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-709343634082808813/original/7d602c84-a837-434c-bdfb-7cf1cae39494.jpeg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$264\nShow price breakdown\n\u00a0\nfor 2 nights\n$264 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/airflow/Hosting-1258717881815737294/original/ff0269be-9bf6-4701-b71d-1ba37d62385d.jpg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$749 \n$600\nShow price breakdown\n\u00a0\nfor 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1604197872498104611/original/07c3051d-4f7b-48a2-957f-ddf955d1d47f.jpeg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$558\nShow price breakdown\n\u00a0\nfor 2 nights\n$558 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/caf5fd3f-2c8b-4d5b-80a7-00f71dfd6429.jpg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$920\nShow price breakdown\n\u00a0\nfor 5 nights\n$920 for 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/453b5d46-6c2d-4383-83a3-74145d4620f0.jpg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$580 \n$534\nShow price breakdown\n\u00a0\nfor 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTI3MjU1ODE5Mzc3MjExNDQ5Mg==/original/a4ecfc67-2269-44c1-ad6b-be101aa22f79.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$722\nShow price breakdown\n\u00a0\nfor 5 nights\n$722 for 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTQ5MzI5OTQ4ODcxOTI3ODgwMA==/original/27b46b6b-492e-422e-ab1b-010474e538ba.jpeg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$340\nShow price breakdown\n\u00a0\nfor 2 nights\n$340 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1521939165236229237/original/e9679908-b910-43e7-a42c-fbda189002cc.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$1,337 \n$1,054\nShow price breakdown\n\u00a0\nfor 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1525080273190297862/original/b79f936b-a752-47da-bb9b-8a81a8f14118.jpeg?im_w=720"
+        "title": "Loft in Lisbon",
+        "price": "$310\nShow price breakdown\n\u00a0\nfor 2 nights\n$310 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/81483927-83d8-4e66-ab5d-30fb076d9324.jpg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$1,124\nShow price breakdown\n\u00a0\nfor 5 nights\n$1,124 for 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1600073226357677563/original/c37828fa-75d9-4703-b19b-9f8e55dd731a.jpeg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$327\nShow price breakdown\n\u00a0\nfor 2 nights\n$327 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/974e44c1-ef55-4928-87e7-88599743d9ee.jpg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$1,221\nShow price breakdown\n\u00a0\nfor 5 nights\n$1,221 for 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1555795260869999134/original/7a41cd6f-e1c5-497b-b2ed-37b1bd675ce8.jpeg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$384\nShow price breakdown\n\u00a0\nfor 2 nights\n$384 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/03b57551-4fed-45c8-9b59-5a3e02b83d93.jpg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$1,249 \n$991\nShow price breakdown\n\u00a0\nfor 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1537639265294291139/original/f9f8c452-a32e-4913-85ca-10dca77acd6f.jpeg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$415\nShow price breakdown\n\u00a0\nfor 2 nights\n$415 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTM5NjQwNTM3ODM3ODcxMzc2NA==/original/4c8ca842-6bc9-4118-bb9c-d644d84684ce.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$888\nShow price breakdown\n\u00a0\nfor 5 nights\n$888 for 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/5f76d168-1fbf-4d44-b07b-4110a33275a9.jpg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$432\nShow price breakdown\n\u00a0\nfor 2 nights\n$432 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1306024368479239844/original/1f02e8a8-54ed-40ec-8430-7c5179199333.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$810 \n$700\nShow price breakdown\n\u00a0\nfor 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/prohost-api/Hosting-1434747451194969994/original/daa27792-5367-4b87-825a-7e70f71d1047.jpeg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$331\nShow price breakdown\n\u00a0\nfor 2 nights\n$331 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/a4df972a-1944-4d90-bfb2-a0f8eaa9d0f0.jpg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$861\nShow price breakdown\n\u00a0\nfor 5 nights\n$861 for 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/prohost-api/Hosting-920207862612546308/original/ce7f47eb-b048-45ba-98c1-cb66f3512512.jpeg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$419\nShow price breakdown\n\u00a0\nfor 2 nights\n$419 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-33084810/original/0798c6b7-716a-4190-9f50-28f541c7728c.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$601\nShow price breakdown\n\u00a0\nfor 5 nights\n$601 for 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/b3ce68f8-d269-4ebc-afb7-89ee32e1c43b.jpg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$514\nShow price breakdown\n\u00a0\nfor 2 nights\n$514 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/63a0996a-bbac-47cf-b73e-3bee9cf69043.jpg?im_w=720"
       },
       {
-        "title": "Apartment in Dubai",
-        "price": "$894\nShow price breakdown\n\u00a0\nfor 5 nights\n$894 for 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/prohost-api/Hosting-999206204142138852/original/ba63dc25-7235-4ea5-b292-4ce0e1bab7a6.jpeg?im_w=720"
+        "title": "Apartment in Lisbon",
+        "price": "$339\nShow price breakdown\n\u00a0\nfor 2 nights\n$339 for 2 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-2117061/original/824b71d8-60ec-487d-8c69-53ae5ff9e806.jpeg?im_w=720"
       }
     ],
-    "selected_listing_title": "",
-    "selected_listing_subtitle": "",
+    "selected_listing_title": "Space and Charm in the Heart of the Historic Center",
+    "selected_listing_subtitle": "Entire rental unit in Lisbon, Portugal",
     "selected_listing_images": [
-      "https://verifi.pdscrb.com/tag?action=view&user_id=62a14177-f845-455c-99f0-abf77e605230&advertiser=airbnb&referrer=_&session_referrer=_&session_landing_url=https%3A%2F%2Fwww.airbnb.com%2F&device_id=pscrb_a05cb63d-96d8-4b98-e902-1a3db86c0184&first_visited_at=1771923722622&stid=&ipv4=210.4.74.25&url=https%3A%2F%2Fwww.airbnb.com%2F&event_url=https%3A%2F%2Fwww.airbnb.com%2F&source=js-tag+v1.0.8&cachebust=1771923724560"
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1390762774837079687/original/3d17f8c2-fe6c-4acf-8bae-336a98fd49e7.jpeg",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1390762774837079687/original/46af9190-a8cf-4303-8bb6-354a92ed532b.jpeg",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1390762774837079687/original/6eed1045-9672-4ae4-8c9e-9cbe0cbeb68a.jpeg",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1390762774837079687/original/66cd38b8-8a11-469a-b1be-221874869a14.jpeg",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1390762774837079687/original/4ccf7cae-cec4-4cca-8d8c-97ef982d3370.jpeg"
     ]
   }
 }

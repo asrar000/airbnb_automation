@@ -18,8 +18,6 @@ class Step07MonitoringLogs(BaseTestStep):
         network_requests = self.shared_state.get("network_requests", [])
         console_messages = self.shared_state.get("console_messages", [])
 
-        screenshot_path = self.screenshot("step07_monitoring")
-
         console_errors = [m for m in console_messages if m.get("type") == "error"]
         network_errors = [
             r for r in network_requests
@@ -52,7 +50,7 @@ class Step07MonitoringLogs(BaseTestStep):
             url=self.page.url,
             passed=passed,
             comment=comment,
-            screenshot_path=screenshot_path,
+            screenshot_path="",
         )
 
         save_network_logs(result, network_requests)
