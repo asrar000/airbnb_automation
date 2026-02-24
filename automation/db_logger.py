@@ -45,16 +45,43 @@ def save_result(
     passed: bool,
     comment: str,
     screenshot_path: str = "",
+    selected_location: str = "",
+    selected_month: str = "",
+    checkin_date: str = "",
+    checkout_date: str = "",
 ) -> ResultModel:
     """Persist a single test-step result and return the saved object."""
     def _save():
-        return ResultModel.objects.create(
+        payload = dict(
             test_case=test_case,
             url=url,
             passed=passed,
             comment=comment,
             screenshot_path=screenshot_path,
+            selected_location=selected_location or "",
+            selected_month=selected_month or "",
+            checkin_date=checkin_date or "",
+            checkout_date=checkout_date or "",
         )
+        try:
+            return ResultModel.objects.create(**payload)
+        except Exception as exc:
+            # Backward-compatible path when DB schema has not been migrated yet.
+            message = str(exc).lower()
+            missing_new_cols = (
+                "no column named selected_location" in message
+                or "no column named selected_month" in message
+                or "no column named checkin_date" in message
+                or "no column named checkout_date" in message
+                or "unknown column" in message
+            )
+            if not missing_new_cols:
+                raise
+            payload.pop("selected_location", None)
+            payload.pop("selected_month", None)
+            payload.pop("checkin_date", None)
+            payload.pop("checkout_date", None)
+            return ResultModel.objects.create(**payload)
 
     result = run_in_thread(_save)
     status = "PASSED ✅" if passed else "FAILED ❌"

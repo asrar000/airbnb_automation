@@ -24,6 +24,10 @@ class ResultModel(models.Model):
     passed = models.BooleanField(default=False)
     comment = models.TextField(blank=True)
     screenshot_path = models.CharField(max_length=500, blank=True)
+    selected_location = models.CharField(max_length=255, blank=True)
+    selected_month = models.CharField(max_length=100, blank=True)
+    checkin_date = models.CharField(max_length=100, blank=True)
+    checkout_date = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

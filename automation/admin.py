@@ -65,9 +65,28 @@ class ConsoleLogInline(admin.TabularInline):
 
 @admin.register(ResultModel)
 class ResultModelAdmin(admin.ModelAdmin):
-    list_display = ("id", "test_case", "url_link", "passed_icon", "comment_short", "created_at")
+    list_display = (
+        "id",
+        "test_case",
+        "url_link",
+        "passed_icon",
+        "selected_location",
+        "selected_month",
+        "checkin_date",
+        "checkout_date",
+        "comment_short",
+        "created_at",
+    )
     list_filter = ("passed", "test_case")
-    search_fields = ("test_case", "url", "comment")
+    search_fields = (
+        "test_case",
+        "url",
+        "comment",
+        "selected_location",
+        "selected_month",
+        "checkin_date",
+        "checkout_date",
+    )
     readonly_fields = ("created_at", "screenshot_preview")
     inlines = [
         AutoSuggestionInline,

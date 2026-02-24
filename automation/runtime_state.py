@@ -15,6 +15,7 @@ CHECKPOINT_KEYS = [
     "target_url",
     "selected_country",
     "chosen_suggestion",
+    "selected_location",
     "chosen_suggestion_index",
     "destination_committed",
     "selected_month",

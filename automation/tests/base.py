@@ -32,7 +32,13 @@ class BaseTestStep(ABC):
         """Helper — take a screenshot and return its path."""
         return take_screenshot(self.page, label)
 
-    def save(self, passed: bool, comment: str, screenshot_path: str = "") -> ResultModel:
+    def save(
+        self,
+        passed: bool,
+        comment: str,
+        screenshot_path: str = "",
+        **extra_fields,
+    ) -> ResultModel:
         """Shortcut to persist a result for this step."""
         return save_result(
             test_case=self.name,
@@ -40,6 +46,7 @@ class BaseTestStep(ABC):
             passed=passed,
             comment=comment,
             screenshot_path=screenshot_path,
+            **extra_fields,
         )
 
     def wait(self, seconds: float = 1.0) -> None:

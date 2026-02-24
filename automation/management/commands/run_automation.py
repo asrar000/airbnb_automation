@@ -10,6 +10,7 @@ Runs the full Airbnb end-to-end automation journey using sync Playwright
 and stores all results in the SQLite database.
 """
 from django.core.management.base import BaseCommand
+from django.core.management import call_command
 from django.conf import settings
 
 from automation.browser import BrowserManager
@@ -41,6 +42,9 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        # Ensure DB schema is current before first result insert.
+        call_command("migrate", interactive=False, verbosity=0)
+
         # Start each run with a fresh checkpoint file.
         clear_checkpoint()
 
@@ -67,6 +71,7 @@ class Command(BaseCommand):
             "target_url": target_url,
             "selected_country": None,
             "chosen_suggestion": None,
+            "selected_location": None,
             "selected_month": None,
             "checkin_date": None,
             "checkout_date": None,

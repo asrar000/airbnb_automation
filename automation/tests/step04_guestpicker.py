@@ -14,11 +14,13 @@ import re
 import time
 
 from automation.tests.base import BaseTestStep
+from automation.db_logger import run_in_thread
 from automation.models import ResultModel
 
 
 class Step04GuestPicker(BaseTestStep):
     name = "Guest Picker Interaction Test"
+    STEP03_RESULT_NAME = "Date Picker Modal Open and Visibility Test"
 
     DATE_FIELD_SELECTORS = [
         '[data-testid="structured-search-input-field-split-dates-0"]',
@@ -175,6 +177,42 @@ class Step04GuestPicker(BaseTestStep):
         except Exception:
             return False
 
+    def _ensure_dates_tab_selected(self) -> bool:
+        try:
+            ensured = bool(self.page.evaluate("""
+                () => {
+                    const norm = (v) => (v || '').trim().toLowerCase();
+                    const isVisible = (el) => {
+                        if (!el) return false;
+                        const r = el.getBoundingClientRect();
+                        return !!r && r.width > 0 && r.height > 0;
+                    };
+                    const isActive = (el) => {
+                        const ariaSelected = norm(el.getAttribute('aria-selected')) === 'true';
+                        const ariaPressed = norm(el.getAttribute('aria-pressed')) === 'true';
+                        const cls = norm((el.className || '').toString());
+                        return ariaSelected || ariaPressed || cls.includes('selected') || cls.includes('active');
+                    };
+
+                    const tabs = [...document.querySelectorAll('button, [role="tab"], div[role="tab"], span[role="tab"]')]
+                        .filter((el) => {
+                            if (!isVisible(el)) return false;
+                            const text = norm(el.innerText || el.textContent);
+                            const aria = norm(el.getAttribute('aria-label'));
+                            return text === 'dates' || text.startsWith('dates ') || aria === 'dates' || aria.includes('dates');
+                        });
+                    if (!tabs.length) return true;
+                    if (tabs.some(isActive)) return true;
+                    tabs[0].click();
+                    return true;
+                }
+            """))
+            if ensured:
+                time.sleep(0.3)
+            return ensured
+        except Exception:
+            return False
+
     def _read_visible_month_label(self) -> str:
         for sel in ['h2[aria-live="polite"]', '[data-testid="calendar-heading"]', 'h2']:
             try:
@@ -280,13 +318,22 @@ class Step04GuestPicker(BaseTestStep):
         checkin_saved = self.shared_state.get("checkin_date", "")
         checkout_saved = self.shared_state.get("checkout_date", "")
         if not (checkin_saved and checkout_saved):
+            restored = self._restore_context_from_db()
+            if restored:
+                print("  Restored location/dates from DB backup.")
+                self.checkpoint("step04_context_restored_from_db")
+                checkin_saved = self.shared_state.get("checkin_date", "")
+                checkout_saved = self.shared_state.get("checkout_date", "")
+        if not (checkin_saved and checkout_saved):
             return False
 
         print("  Dates missing — restoring from checkpoint.")
         if not self._open_date_picker():
             return False
 
+        self._ensure_dates_tab_selected()
         self._move_to_saved_month()
+        self._ensure_dates_tab_selected()
 
         if not self._click_saved_date(checkin_saved):
             return False
@@ -297,6 +344,60 @@ class Step04GuestPicker(BaseTestStep):
         time.sleep(0.8)
 
         return self._dates_present_in_ui()
+
+    def _restore_context_from_db(self) -> bool:
+        """
+        Fallback when checkpoint/shared_state are missing after refresh.
+        Uses the latest passed Step 03 row to restore location + dates.
+        """
+        try:
+            payload = run_in_thread(
+                lambda: ResultModel.objects.filter(
+                    test_case=self.STEP03_RESULT_NAME,
+                    passed=True,
+                )
+                .order_by("-created_at")
+                .values(
+                    "selected_location",
+                    "selected_month",
+                    "checkin_date",
+                    "checkout_date",
+                )
+                .first()
+            )
+        except Exception:
+            return False
+
+        if not payload:
+            return False
+
+        restored = False
+        selected_location = (payload.get("selected_location") or "").strip()
+        selected_month = (payload.get("selected_month") or "").strip()
+        checkin_date = (payload.get("checkin_date") or "").strip()
+        checkout_date = (payload.get("checkout_date") or "").strip()
+
+        if selected_location:
+            if not self.shared_state.get("selected_location"):
+                self.shared_state["selected_location"] = selected_location
+                restored = True
+            if not self.shared_state.get("selected_country"):
+                self.shared_state["selected_country"] = selected_location
+                restored = True
+            if not self.shared_state.get("chosen_suggestion"):
+                self.shared_state["chosen_suggestion"] = selected_location
+                restored = True
+        if selected_month and not self.shared_state.get("selected_month"):
+            self.shared_state["selected_month"] = selected_month
+            restored = True
+        if checkin_date and not self.shared_state.get("checkin_date"):
+            self.shared_state["checkin_date"] = checkin_date
+            restored = True
+        if checkout_date and not self.shared_state.get("checkout_date"):
+            self.shared_state["checkout_date"] = checkout_date
+            restored = True
+
+        return restored
 
     def run(self) -> ResultModel:
         print("\n[Step 04] Guest Picker Interaction...")
@@ -374,6 +475,34 @@ class Step04GuestPicker(BaseTestStep):
                     except Exception:
                         break
 
+            # Guarantee the requested 2-5 random additions even when the random
+            # split above leaves remainder unassigned.
+            while remaining > 0:
+                btns = self._get_increase_buttons()
+                usable = list(range(min(len(btns), 4)))
+                if not usable:
+                    break
+                random.shuffle(usable)
+                clicked_any = False
+                for btn_idx in usable:
+                    try:
+                        btns[btn_idx].click()
+                        total_added += 1
+                        if btn_idx == 0:
+                            added_counts["adults"] += 1
+                        else:
+                            key = idx_to_key.get(btn_idx)
+                            if key:
+                                added_counts[key] += 1
+                        remaining -= 1
+                        clicked_any = True
+                        time.sleep(0.3)
+                        break
+                    except Exception:
+                        continue
+                if not clicked_any:
+                    break
+
         # Airbnb "guests" typically means adults + children (infants/pets separate).
         search_guest_count = added_counts["adults"] + added_counts["children"]
         self.shared_state["guest_count"] = search_guest_count
@@ -394,6 +523,19 @@ class Step04GuestPicker(BaseTestStep):
         # Verify displayed guest count matches selected values
         guest_display = self._get_guest_display()
         print(f"  Guest field displays: '{guest_display}'")
+        displayed_guest_count = self._extract_first_int(guest_display) or 0
+        guest_count_matches = displayed_guest_count == search_guest_count
+        guest_display_lower = (guest_display or "").lower()
+        extras_visible = True
+        if added_counts["infants"] > 0 and "infant" not in guest_display_lower:
+            extras_visible = False
+        if added_counts["pets"] > 0 and "pet" not in guest_display_lower:
+            extras_visible = False
+        print(
+            "  Guest count verification: "
+            f"displayed={displayed_guest_count}, expected={search_guest_count}, "
+            f"match={guest_count_matches}, extras_visible={extras_visible}"
+        )
 
         # Click the Search button — triggers navigation to results page (Step 05)
         search_clicked = False
@@ -432,7 +574,9 @@ class Step04GuestPicker(BaseTestStep):
             f"(adults={added_counts['adults']}, children={added_counts['children']}, "
             f"infants={added_counts['infants']}, pets={added_counts['pets']}). "
             f"Search guest count: {search_guest_count}. "
-            f"Field shows: '{guest_display}'. Search clicked: {search_clicked}."
+            f"Field shows: '{guest_display}' (displayed count: {displayed_guest_count}, "
+            f"matches selected: {guest_count_matches}, extras visible: {extras_visible}). "
+            f"Search clicked: {search_clicked}."
         )
-        passed = popup_visible and total_added > 0 and search_clicked
+        passed = popup_visible and total_added >= 2 and guest_count_matches and extras_visible and search_clicked
         return self.save(passed, comment, screenshot_path)

@@ -48,11 +48,35 @@ class Step05RefineSearch(BaseTestStep):
 
     @staticmethod
     def _extract_day_token(date_text: str) -> str:
-        # Supports labels like "May 7, 2026" and "Friday, May 07, 2026"
-        match = re.search(r"\b([0-3]?\d)(?:,|\s+\d{4})", date_text or "")
-        if not match:
-            return ""
-        return match.group(1).lstrip("0") or "0"
+        # Supports labels like:
+        # - "May 7, 2026"
+        # - "Friday, May 07, 2026"
+        # - "Jul 8"
+        text = date_text or ""
+        month_pattern = (
+            r"january|february|march|april|may|june|july|august|"
+            r"september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec"
+        )
+        month_first = re.search(
+            rf"\b(?:{month_pattern})\.?\s+([0-3]?\d)\b",
+            text,
+            re.IGNORECASE,
+        )
+        if month_first:
+            return month_first.group(1).lstrip("0") or "0"
+
+        day_first = re.search(
+            rf"\b([0-3]?\d)(?:st|nd|rd|th)?\s+(?:of\s+)?(?:{month_pattern})\b",
+            text,
+            re.IGNORECASE,
+        )
+        if day_first:
+            return day_first.group(1).lstrip("0") or "0"
+
+        fallback = re.search(r"\b([0-3]?\d)\b", text)
+        if fallback:
+            return fallback.group(1).lstrip("0") or "0"
+        return ""
 
     @staticmethod
     def _extract_day_from_iso(date_text: str) -> str:

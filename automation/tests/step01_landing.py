@@ -474,6 +474,7 @@ class Step01LandingAndSearch(BaseTestStep):
 
         destination = random.choice(TOP_SEARCH_DESTINATIONS)
         self.shared_state["selected_country"] = destination
+        self.shared_state["selected_location"] = destination
         print(f"  Selected destination: {destination}")
         self.checkpoint("step01_destination_selected")
 
@@ -563,12 +564,14 @@ class Step01LandingAndSearch(BaseTestStep):
                 False,
                 f"Homepage loaded, but suggestions did not appear for '{destination}'.",
                 screenshot_path2,
+                selected_location=destination,
             )
 
         # Click suggestion — this opens the date picker (Step 03)
         chosen_index = random.randint(0, min(len(suggestions) - 1, 4))
         chosen_text = suggestions[chosen_index]
         self.shared_state["chosen_suggestion"] = chosen_text
+        self.shared_state["selected_location"] = chosen_text
         self.shared_state["chosen_suggestion_index"] = chosen_index
         print(f"  Clicking suggestion #{chosen_index + 1}: '{chosen_text}'")
 
@@ -587,6 +590,7 @@ class Step01LandingAndSearch(BaseTestStep):
                 selection_method = "keyboard_enter"
                 chosen_text = destination
                 self.shared_state["chosen_suggestion"] = destination
+                self.shared_state["selected_location"] = destination
 
         print(f"  Suggestion commit success: {clicked} (method: {selection_method})")
         self.shared_state["destination_committed"] = bool(clicked)
@@ -599,6 +603,7 @@ class Step01LandingAndSearch(BaseTestStep):
                 f"Suggestions appeared ({len(suggestions)}), but selecting "
                 f"'{chosen_text}' failed (click + Enter fallback).",
                 screenshot_path2,
+                selected_location=destination,
             )
 
         return self.save(
@@ -606,4 +611,5 @@ class Step01LandingAndSearch(BaseTestStep):
             f"Homepage loaded. Title: '{title}'. Destination '{destination}' typed. "
             f"Suggestions: {len(suggestions)}. Selected: '{chosen_text}' via {selection_method}.",
             screenshot_path2,
+            selected_location=chosen_text or destination,
         )
