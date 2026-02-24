@@ -1,134 +1,120 @@
 {
   "step": "step06_listing_detail_collected",
-  "saved_at": "2026-02-24T08:19:29.671270+00:00",
+  "saved_at": "2026-02-24T09:02:53.611862+00:00",
   "state": {
     "target_url": "https://www.airbnb.com/",
-    "selected_country": "Sydney",
-    "chosen_suggestion": "Sydney Central Inn, New South Wales, Australia",
-    "selected_location": "Sydney Central Inn, New South Wales, Australia",
-    "chosen_suggestion_index": 4,
+    "selected_country": "Dubai",
+    "chosen_suggestion": "Dubai Marina",
+    "selected_location": "Dubai Marina",
+    "chosen_suggestion_index": 2,
     "destination_committed": true,
-    "selected_month": "October 2026",
-    "checkin_date": "16, Friday, October 2026. Selected check-in date.",
-    "checkout_date": "19, Monday, October 2026. Selected checkout date.",
-    "guest_count": 1,
+    "selected_month": "September 2026",
+    "checkin_date": "16, Wednesday, September 2026. Selected check-in date.",
+    "checkout_date": "21, Monday, September 2026. Selected checkout date.",
+    "guest_count": 3,
     "guest_breakdown": {
-      "adults": 1,
+      "adults": 3,
       "children": 0,
-      "infants": 0,
-      "pets": 3
+      "infants": 1,
+      "pets": 0
     },
     "guest_total_added": 4,
     "listings": [
       {
-        "title": "Loft in Beaconsfield",
-        "price": "$515\nShow price breakdown\n\u00a0\nfor 3 nights\n$515 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/a5550cbf-76fb-42e3-8bd7-3be6b4a3d3c2.jpg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$952 \n$790\nShow price breakdown\n\u00a0\nfor 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-52606784/original/a25e1b67-1f54-4332-9f5e-3c09775b3736.jpeg?im_w=720"
       },
       {
-        "title": "Place to stay in Surry Hills",
-        "price": "$335\nShow price breakdown\n\u00a0\nfor 3 nights\n$335 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/d40d9a61-986f-49c3-a9cf-88f9ac2c4a59.jpg?im_w=720"
+        "title": "Condo in Dubai",
+        "price": "$968\nShow price breakdown\n\u00a0\nfor 5 nights\n$968 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1562929062371017434/original/2b78eb3b-66e4-4495-88c0-e62d02a3c1e0.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Haymarket",
-        "price": "$932\nShow price breakdown\n\u00a0\nfor 3 nights\n$932 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-34515869/original/370827d0-c008-48a5-af50-8a3d7c3d1cdb.jpeg?im_w=720"
+        "title": "Condo in Dubai",
+        "price": "$876\nShow price breakdown\n\u00a0\nfor 5 nights\n$876 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MjgzMzQ3OA%3D%3D/original/57557ab5-f080-426c-824a-1758d90493b6.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Surry Hills",
-        "price": "$718\nShow price breakdown\n\u00a0\nfor 3 nights\n$718 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1088559037162386251/original/0d8dc252-41f6-4eab-aaba-c9d388699e74.jpeg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$582\nShow price breakdown\n\u00a0\nfor 5 nights\n$582 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6Mjc2NzY4MzE%3D/original/3fa30bf6-f992-4b72-b872-21c2c8d56374.jpeg?im_w=720"
       },
       {
-        "title": "Hotel in Annandale",
-        "price": "$271 \n$250\nShow price breakdown\n\u00a0\nfor 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/7470a5be-caf4-445e-bafc-2d8510a073f5.jpg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$1,218\nShow price breakdown\n\u00a0\nfor 5 nights\n$1,218 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTM1NTg3MzUxNTgxNDY1OTc4MA%3D%3D/original/671bd694-b7ab-458e-894a-26a242ab29be.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Alexandria",
-        "price": "$683\nShow price breakdown\n\u00a0\nfor 3 nights\n$683 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1291149173561564763/original/a447ddcc-c68e-438b-882b-e086744bad85.jpeg?im_w=720"
+        "title": "Condo in Dubai",
+        "price": "$1,065 \n$966\nShow price breakdown\n\u00a0\nfor 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-709343634082808813/original/7d602c84-a837-434c-bdfb-7cf1cae39494.jpeg?im_w=720"
       },
       {
-        "title": "Place to stay in Surry Hills",
-        "price": "$205\nShow price breakdown\n\u00a0\nfor 2 nights\n$205 for 2 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/airflow/Hosting-20727256/original/3844ea6c-cfb4-4c03-a955-22dfd9032e88.jpg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$749 \n$600\nShow price breakdown\n\u00a0\nfor 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1604197872498104611/original/07c3051d-4f7b-48a2-957f-ddf955d1d47f.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Sydney",
-        "price": "$1,180\nShow price breakdown\n\u00a0\nfor 5 nights\n$1,180 for 5 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6Mjc3MTYyNDQ%3D/original/0b8cba9a-f8bb-487a-b00f-a3576c82cf18.jpeg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$920\nShow price breakdown\n\u00a0\nfor 5 nights\n$920 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/453b5d46-6c2d-4383-83a3-74145d4620f0.jpg?im_w=720"
       },
       {
-        "title": "Place to stay in Newtown",
-        "price": "$480\nShow price breakdown\n\u00a0\nfor 4 nights\n$480 for 4 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/25a31a65-4279-4321-a67b-3441cc8ce95f.jpg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$722\nShow price breakdown\n\u00a0\nfor 5 nights\n$722 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTQ5MzI5OTQ4ODcxOTI3ODgwMA==/original/27b46b6b-492e-422e-ab1b-010474e538ba.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Sydney",
-        "price": "$2,079\nShow price breakdown\n\u00a0\nfor 6 nights\n$2,079 for 6 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-568164208044632587/original/63366ace-5401-4bc9-a4ec-e251da93cbda.jpeg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$1,337 \n$1,054\nShow price breakdown\n\u00a0\nfor 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1525080273190297862/original/b79f936b-a752-47da-bb9b-8a81a8f14118.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Sydney",
-        "price": "$734\nShow price breakdown\n\u00a0\nfor 3 nights\n$734 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/203f742d-2443-4071-9e38-7f8dc2deeded.jpg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$1,124\nShow price breakdown\n\u00a0\nfor 5 nights\n$1,124 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1600073226357677563/original/c37828fa-75d9-4703-b19b-9f8e55dd731a.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Potts Point",
-        "price": "$544\nShow price breakdown\n\u00a0\nfor 3 nights\n$544 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6OTYwNzI5NjQ5MTE2OTYxMDM5/original/78866574-1890-43da-9f8a-5004aed73901.jpeg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$1,221\nShow price breakdown\n\u00a0\nfor 5 nights\n$1,221 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1555795260869999134/original/7a41cd6f-e1c5-497b-b2ed-37b1bd675ce8.jpeg?im_w=720"
       },
       {
-        "title": "Home in Redfern",
-        "price": "$1,177\nShow price breakdown\n\u00a0\nfor 3 nights\n$1,177 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1612014143693289069/original/03d1defd-573b-40c0-86f5-e708ca648a5e.jpeg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$1,249 \n$991\nShow price breakdown\n\u00a0\nfor 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1537639265294291139/original/f9f8c452-a32e-4913-85ca-10dca77acd6f.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Surry Hills",
-        "price": "$1,045\nShow price breakdown\n\u00a0\nfor 3 nights\n$1,045 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-1602534149769466409/original/6191f1ba-ce04-4a1e-8756-34df52c3b1a8.jpeg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$888\nShow price breakdown\n\u00a0\nfor 5 nights\n$888 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/5f76d168-1fbf-4d44-b07b-4110a33275a9.jpg?im_w=720"
       },
       {
-        "title": "Apartment in Surry Hills",
-        "price": "$925\nShow price breakdown\n\u00a0\nfor 3 nights\n$925 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-1027883544070569962/original/ad5e182b-8cf1-4053-9a3c-756a8b389a66.jpeg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$810 \n$700\nShow price breakdown\n\u00a0\nfor 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/prohost-api/Hosting-1434747451194969994/original/daa27792-5367-4b87-825a-7e70f71d1047.jpeg?im_w=720"
       },
       {
-        "title": "Condo in Potts Point",
-        "price": "$585\nShow price breakdown\n\u00a0\nfor 3 nights\n$585 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-31387141/original/3257b2b3-62ff-449a-b113-7d8049cdeef8.jpeg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$861\nShow price breakdown\n\u00a0\nfor 5 nights\n$861 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/prohost-api/Hosting-920207862612546308/original/ce7f47eb-b048-45ba-98c1-cb66f3512512.jpeg?im_w=720"
       },
       {
-        "title": "Apartment in Haymarket",
-        "price": "$1,203\nShow price breakdown\n\u00a0\nfor 3 nights\n$1,203 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/prohost-api/Hosting-1609871476316745578/original/b9732d20-d47c-4f23-9db5-0377b6e14db1.jpeg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$601\nShow price breakdown\n\u00a0\nfor 5 nights\n$601 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/b3ce68f8-d269-4ebc-afb7-89ee32e1c43b.jpg?im_w=720"
       },
       {
-        "title": "Apartment in Haymarket",
-        "price": "$847\nShow price breakdown\n\u00a0\nfor 3 nights\n$847 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/prohost-api/Hosting-1609861833416822680/original/3fcce41b-357d-4538-a34c-10ccc3d60d8b.jpeg?im_w=720"
-      },
-      {
-        "title": "Apartment in Bondi Junction",
-        "price": "$613\nShow price breakdown\n\u00a0\nfor 3 nights\n$613 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/miso/Hosting-52521049/original/615230e6-2afb-4c68-bec2-df18c3773176.jpeg?im_w=720"
-      },
-      {
-        "title": "Place to stay in Petersham",
-        "price": "$289\nShow price breakdown\n\u00a0\nfor 3 nights\n$289 for 3 nights",
-        "image_url": "https://a0.muscache.com/im/pictures/hosting/Hosting-22578432/original/03d38ec4-5539-4fb4-a3c7-d09a83b4de3e.jpeg?im_w=720"
+        "title": "Apartment in Dubai",
+        "price": "$894\nShow price breakdown\n\u00a0\nfor 5 nights\n$894 for 5 nights",
+        "image_url": "https://a0.muscache.com/im/pictures/prohost-api/Hosting-999206204142138852/original/ba63dc25-7235-4ea5-b292-4ce0e1bab7a6.jpeg?im_w=720"
       }
     ],
-    "selected_listing_title": "Convenient,private studio close to airport and cbd",
+    "selected_listing_title": "",
     "selected_listing_subtitle": "",
     "selected_listing_images": [
-      "https://a0.muscache.com/im/pictures/a5550cbf-76fb-42e3-8bd7-3be6b4a3d3c2.jpg?im_w=720",
-      "https://a0.muscache.com/im/pictures/ff546f2c-bcd6-45b1-8d5b-90648fb433bf.jpg?im_w=720",
-      "https://a0.muscache.com/im/pictures/1653e471-1ddf-4358-84a3-fb677ebee39d.jpg?im_w=720",
-      "https://a0.muscache.com/im/pictures/f0622051-a21f-405b-88cd-1f5250acaabd.jpg?im_w=720",
-      "https://a0.muscache.com/im/pictures/66acd0a6-6a17-470e-a652-c30381124897.jpg?im_w=720"
+      "https://verifi.pdscrb.com/tag?action=view&user_id=62a14177-f845-455c-99f0-abf77e605230&advertiser=airbnb&referrer=_&session_referrer=_&session_landing_url=https%3A%2F%2Fwww.airbnb.com%2F&device_id=pscrb_a05cb63d-96d8-4b98-e902-1a3db86c0184&first_visited_at=1771923722622&stid=&ipv4=210.4.74.25&url=https%3A%2F%2Fwww.airbnb.com%2F&event_url=https%3A%2F%2Fwww.airbnb.com%2F&source=js-tag+v1.0.8&cachebust=1771923724560"
     ]
   }
 }
